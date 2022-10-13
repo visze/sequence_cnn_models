@@ -17,13 +17,15 @@ min_version("7.15.2")
 
 
 include: "rules/common.smk"
+include: "rules/sequence_selection_common.smk"
+include: "rules/sequence_selection.smk"
 
 
 rule all:
     input:
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
-        expand("results/plots/{sample}.png", sample=samples.index),
-
-
-include: "rules/other.smk"
+        expand(
+            "results/sequence_selection/sequence.annotated.{dataset}.fa.gz",
+            dataset=["test", "training", "validation"],
+        ),
