@@ -120,14 +120,14 @@ rule sequence_selection_annotate_regions:
         regions="results/sequence_selection/regions.overlap.all.bed.gz",
         samples=lambda wc: expand(
             "results/sequence_selection/regions.overlap_sample.{sample}.bed.gz",
-            sample=list(samples.keys()),
+            sample=list(samples.index),
         ),
         negative="results/sequence_selection/negatives.regions.final.bed.gz",
         genome=config["reference"]["genome"],
     output:
         regions="results/sequence_selection/regions.annotated.all.bed.gz",
     params:
-        names=lambda wc: "\t".join(list(samples.keys()) + ["negatives"]),
+        names=lambda wc: "\t".join(list(samples.index) + ["negatives"]),
     shell:
         """
         bedtools annotate -i {input.regions} -files {input.samples} {input.negative} -names "{params.names}" | \
