@@ -147,7 +147,7 @@ rule sequence_selection_training_regions:
         "zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | bgzip -c > {output}"
 
 
-rule validateRegions:
+rule sequence_selection_validation_regions:
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
@@ -156,7 +156,7 @@ rule validateRegions:
         "zcat {input} | egrep '^chr18' | bgzip -c > {output}"
 
 
-rule testRegions:
+rule sequence_selection_test_regions:
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
@@ -165,7 +165,7 @@ rule testRegions:
         "zcat {input} | egrep '^chr8' | bgzip -c > {output}"
 
 
-rule extractFasta:
+rule sequence_selection_extract_fasta:
     input:
         regions="results/sequence_selection/regions.annotated.{dataset}.bed.gz",
         reference=config["reference"]["fasta"],
