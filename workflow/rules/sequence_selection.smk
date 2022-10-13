@@ -1,5 +1,7 @@
 
 rule sequence_selection_overlap_regions:
+    conda:
+        "../envs/default.yml"
     input:
         regions=getRegionFiles(),
         genome=config["reference"]["genome"],
@@ -8,6 +10,8 @@ rule sequence_selection_overlap_regions:
     params:
         merge=lambda wc: config["input"]["merge"],
         length=lambda wc: config["input"]["length"],
+    log:
+        "logs/sequence_selection/overlap_regions.log"
     shell:
         """
         bedtools merge -d {params.merge} -i <(
@@ -22,6 +26,8 @@ rule sequence_selection_overlap_regions:
 
 
 rule sequence_selection_annotate_overlap:
+    conda:
+        "../envs/default.yml"
     input:
         region=lambda wc: getRegionFileFromSample(wc.sample),
         genome=config["reference"]["genome"],
@@ -29,6 +35,8 @@ rule sequence_selection_annotate_overlap:
         region="results/sequence_selection/regions.overlap_sample.{sample}.bed.gz",
     params:
         length=lambda wc: config["input"]["length"],
+    log:
+        "logs/sequence_selection/annotate_overlap.log",
     shell:
         """
         zcat {input.region} | egrep "^chr([0-9]+|[XYM])\\s" | \
@@ -51,6 +59,8 @@ rule sequence_selection_negative_background_widnows:
     params:
         length=lambda wc: wc.length,
         sliding=lambda wc: wc.sliding,
+    log:
+        "logs/sequence_selection/negative_background_widnows.{length}.{sliding}.log",
     wrapper:
         getWrapper("negative_training_sampler/create_windows_over_genome")
 
@@ -65,6 +75,8 @@ rule sequence_selection_negative_background_input:
         ),
     output:
         "results/sequence_selection/negatives.regions.input.bed.gz",
+    log:
+        "logs/sequence_selection/negative_background_input.log",
     wrapper:
         getWrapper("negative_training_sampler/create_input")
 
@@ -83,15 +95,21 @@ rule sequence_selection_negative_background_sampler:
     params:
         seed=lambda wc: random.Random(config["seed"]).randint(0, 100000),
         memory="10GB",
+    log:
+        "results/logs/sequence_selection/negative_background_sampler.log"
     wrapper:
         getWrapper("negative_training_sampler/0.3.0")
 
 
 rule sequence_selection_negative_background_final:
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/negatives.regions.selected.bed.gz",
     output:
         "results/sequence_selection/negatives.regions.final.bed.gz",
+    log:
+        "logs/sequence_selection/negative_background_final.log",
     shell:
         """
         zcat {input} | \
@@ -104,11 +122,15 @@ rule sequence_selection_negative_background_final:
 
 
 rule sequence_selection_create_regions_file:
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/negatives.regions.final.bed.gz",
         "results/sequence_selection/regions.overlap.positives.bed.gz",
     output:
         "results/sequence_selection/regions.overlap.all.bed.gz",
+    log:
+        "logs/sequence_selection/create_regions_file.log",
     shell:
         """
         zcat {input} | sort -k1,1 -k2,2n | uniq | bgzip -c > {output}
@@ -116,6 +138,8 @@ rule sequence_selection_create_regions_file:
 
 
 rule sequence_selection_annotate_regions:
+    conda:
+        "../envs/default.yml"
     input:
         regions="results/sequence_selection/regions.overlap.all.bed.gz",
         samples=lambda wc: expand(
@@ -128,6 +152,8 @@ rule sequence_selection_annotate_regions:
         regions="results/sequence_selection/regions.annotated.all.bed.gz",
     params:
         names=lambda wc: "\t".join(list(samples.index) + ["negatives"]),
+    log:
+        "logs/sequence_selection/annotate_regions.log",
     shell:
         """
         bedtools annotate -i {input.regions} -files {input.samples} {input.negative} -names "{params.names}" | \
@@ -139,38 +165,54 @@ rule sequence_selection_annotate_regions:
 
 
 rule sequence_selection_training_regions:
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.training.bed.gz",
+    log:
+        "logs/sequence_selection/training_regions.log",
     shell:
         "zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | bgzip -c > {output}"
 
 
 rule sequence_selection_validation_regions:
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.validation.bed.gz",
+    log:
+        "logs/sequence_selection/validation_regions.log",
     shell:
         "zcat {input} | egrep '^chr18' | bgzip -c > {output}"
 
 
 rule sequence_selection_test_regions:
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.test.bed.gz",
+    log:
+        "logs/sequence_selection/test_regions.log",
     shell:
         "zcat {input} | egrep '^chr8' | bgzip -c > {output}"
 
 
 rule sequence_selection_extract_fasta:
+    conda:
+        "../envs/default.yml"
     input:
         regions="results/sequence_selection/regions.annotated.{dataset}.bed.gz",
         reference=config["reference"]["fasta"],
     output:
         sequences="results/sequence_selection/sequence.annotated.{dataset}.fa.gz",
+    log:
+        "logs/sequence_selection/extract_fasta.{dataset}.log",
     shell:
         """
         bedtools getfasta -s -fi {input.reference} -bed {input.regions} | bgzip -c > {output.sequences}

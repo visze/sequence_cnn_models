@@ -6,7 +6,9 @@ channels:
   - defaults
 dependencies:
   - click
-  - matplotlib
   - numpy
   - pandas
   - python
+  - bedtools
+  - htslib
+  - 
