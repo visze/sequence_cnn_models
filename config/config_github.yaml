@@ -1,0 +1,2 @@
+# config file for github actions
+samples: "/github/workspace/config/samples.tsv"

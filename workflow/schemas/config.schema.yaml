@@ -1,0 +1,47 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+description: snakemake configuration file
+
+type: object
+
+# possible entries of the config file and which type they should be
+properties:
+  seed:
+    type: integer
+  wrapper_directory:
+    type: string
+  reference:
+    type: object
+    properties:
+      genome:
+        type: string
+      fasta:
+        type: string
+    required:
+      - genome
+      - fasta
+  input:
+    type: object
+    properties:
+      length:
+        type: integer
+        default: 300
+      merge:
+        type: integer
+        default: 50
+      sliding:
+        type: integer
+        default: 50
+    required:
+      - length
+      - merge
+      - sliding
+  samples:
+    type: string
+
+# entries that have to be in the config file for successful validation
+required:
+  - seed
+  - wrapper_directory
+  - reference
+  - samples

@@ -1,0 +1,17 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+
+description: an entry in the sample sheet
+
+# columns that the config/samples.tsv file can have and which type they should be
+properties:
+  sample_id:
+    type: string
+    description: sample name/identifier
+  region_file:
+    type: string
+    description: Path to the region file. (bed.gz)
+
+# columns that the config/samples.tsv file must have to pass schema validation
+required:
+  - sample_id
+  - region_file
