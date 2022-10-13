@@ -1,2 +1,11 @@
 # config file for github actions
-samples: "/github/workspace/config/samples.tsv"
+seed: 42
+wrapper_directory: path/to/wrapper_directory
+reference:
+  genome: path/to/genome.file 
+  fasta: path/to/genome.fasta
+input:
+  length: 300
+  merge: 50
+  sliding: 50
+samples: /github/workspace/config/samples.tsv
