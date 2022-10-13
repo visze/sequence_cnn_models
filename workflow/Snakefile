@@ -19,6 +19,7 @@ min_version("7.15.2")
 include: "rules/common.smk"
 include: "rules/sequence_selection_common.smk"
 include: "rules/sequence_selection.smk"
+include: "rules/training.smk"
 
 
 rule all:
@@ -26,6 +27,6 @@ rule all:
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
         expand(
-            "results/sequence_selection/sequence.annotated.{dataset}.fa.gz",
+            "results/sequence_selection/sequence.annotated_bidirectional.{dataset}.fa.gz",
             dataset=["test", "training", "validation"],
         ),

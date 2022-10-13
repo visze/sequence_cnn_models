@@ -11,7 +11,7 @@ rule sequence_selection_overlap_regions:
         merge=lambda wc: config["input"]["merge"],
         length=lambda wc: config["input"]["length"],
     log:
-        "logs/sequence_selection/overlap_regions.log"
+        "logs/sequence_selection/overlap_regions.log",
     shell:
         """
         bedtools merge -d {params.merge} -i <(
@@ -96,7 +96,7 @@ rule sequence_selection_negative_background_sampler:
         seed=lambda wc: random.Random(config["seed"]).randint(0, 100000),
         memory="10GB",
     log:
-        "results/logs/sequence_selection/negative_background_sampler.log"
+        "results/logs/sequence_selection/negative_background_sampler.log",
     wrapper:
         getWrapper("negative_training_sampler/0.3.0")
 
@@ -203,14 +203,34 @@ rule sequence_selection_test_regions:
         "zcat {input} | egrep '^chr8' | bgzip -c > {output}"
 
 
+# bidirectional
+
+
+rule sequence_selection_bidirectional:
+    input:
+        "results/sequence_selection/regions.annotated.{dataset}.bed.gz",
+    output:
+        "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
+    shell:
+        """
+        (
+            zcat {input} | awk -v "OFS=\\t" '{{$6="+";print$0}}'; \
+            zcat {input} | awk -v "OFS=\\t" '{{$6="-";print$0}}';
+        ) | sort -k1,1 -k2,2n | bgzip -c > {output}
+        """
+
+
+# extract fasta
+
+
 rule sequence_selection_extract_fasta:
     conda:
         "../envs/default.yml"
     input:
-        regions="results/sequence_selection/regions.annotated.{dataset}.bed.gz",
+        regions="results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
         reference=config["reference"]["fasta"],
     output:
-        sequences="results/sequence_selection/sequence.annotated.{dataset}.fa.gz",
+        sequences="results/sequence_selection/sequence.annotated_bidirectional.{dataset}.fa.gz",
     log:
         "logs/sequence_selection/extract_fasta.{dataset}.log",
     shell:
