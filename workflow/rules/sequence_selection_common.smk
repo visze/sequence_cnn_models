@@ -2,9 +2,7 @@ def getRegionFileFromSample(sample_id):
     """
     Return a region file from a sample.
     """
-    print(sample_id)
-    print(samples[sample_id])
-    return samples[sample_id]["region_file"]
+    return samples.loc[sample_id]["region_file"]
 
 
 def getRegionFiles():
