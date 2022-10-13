@@ -49,8 +49,8 @@ rule sequence_selection_negative_background_widnows:
     output:
         "results/sequence_selection/negatives.windows.{length}l.{sliding}s.bed.gz",
     params:
-        length="{length}",
-        sliding="{sliding}",
+        length=lambda wc: wc.length,
+        sliding=lambda wc: wc.sliding,
     wrapper:
         getWrapper("negative_training_sampler/create_windows_over_genome")
 
