@@ -134,13 +134,15 @@ rule sequence_selection_annotate_regions:
         sort -k1,1 -k2,2n | uniq | bgzip -c > {output.regions}
         """
 
+
 # train test validate regions
+
 
 rule sequence_selection_training_regions:
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
-        "results/sequence_selection/regions.annotated.training.bed.gz
+        "results/sequence_selection/regions.annotated.training.bed.gz",
     shell:
         "zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | bgzip -c > {output}"
 
@@ -149,7 +151,7 @@ rule validateRegions:
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
-        "results/sequence_selection/regions.annotated.validation.bed.gz
+        "results/sequence_selection/regions.annotated.validation.bed.gz",
     shell:
         "zcat {input} | egrep '^chr18' | bgzip -c > {output}"
 
@@ -158,15 +160,15 @@ rule testRegions:
     input:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
-        "results/sequence_selection/regions.annotated.test.bed.gz
+        "results/sequence_selection/regions.annotated.test.bed.gz",
     shell:
         "zcat {input} | egrep '^chr8' | bgzip -c > {output}"
 
 
 rule extractFasta:
     input:
-        regions="results/sequence_selection/regions.annotated.{dataset}.bed.gz"
-        reference=config["reference"],
+        regions="results/sequence_selection/regions.annotated.{dataset}.bed.gz",
+        reference=config["reference"]["fasta"],
     output:
         sequences="results/sequence_selection/sequence.annotated.{dataset}.fa.gz",
     shell:
