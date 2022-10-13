@@ -123,7 +123,7 @@ rule sequence_selection_annotate_regions:
             sample=list(samples.keys()),
         ),
         negative="results/sequence_selection/negatives.regions.final.bed.gz",
-        genome=config["genome"],
+        genome=config["reference"]["genome"],
     output:
         regions="results/sequence_selection/regions.annotated.all.bed.gz",
     params:
