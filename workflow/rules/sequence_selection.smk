@@ -36,7 +36,7 @@ rule sequence_selection_annotate_overlap:
     params:
         length=lambda wc: config["input"]["length"],
     log:
-        "logs/sequence_selection/annotate_overlap.log",
+        "logs/sequence_selection/annotate_overlap.{sample}.log",
     shell:
         """
         zcat {input.region} | egrep "^chr([0-9]+|[XYM])\\s" | \
