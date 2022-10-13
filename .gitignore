@@ -4,6 +4,7 @@ analysis/*
 !analysis/README.md
 !config
 !config/*
+!docs
 !docs/*
 !resources
 !resources/*

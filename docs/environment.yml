@@ -1,0 +1,14 @@
+---
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - python
+  - sphinx
+  - rstcheck
+  - recommonmark
+  - urllib3
+  - pip:
+      - sphinx-rtd-theme
