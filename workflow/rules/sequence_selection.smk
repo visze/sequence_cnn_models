@@ -60,8 +60,8 @@ rule sequence_selection_negative_background_input:
         positives="results/sequence_selection/regions.overlap.positives.bed.gz",
         negatives=lambda wc: expand(
             "results/sequence_selection/negatives.windows.{length}l.{sliding}s.bed.gz",
-            length=lambda wc: config["input"]["length"],
-            sliding=lambda wc: config["input"]["sliding"],
+            length=config["input"]["length"],
+            sliding=config["input"]["sliding"],
         ),
     output:
         "results/sequence_selection/negatives.regions.input.bed.gz",
