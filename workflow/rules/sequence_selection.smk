@@ -225,10 +225,13 @@ rule sequence_selection_test_regions:
 
 
 rule sequence_selection_bidirectional:
+    conda: "../envs/default.yml"
     input:
         "results/sequence_selection/regions.annotated.{dataset}.bed.gz",
     output:
         "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
+    log:
+        "logs/sequence_selection/bidirectional.log",
     shell:
         """
         (
