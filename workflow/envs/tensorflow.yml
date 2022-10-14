@@ -1,0 +1,15 @@
+---
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - click
+  - kipoi
+  - kipoi-utils
+  - kipoiseq
+  - numpy
+  - pandas
+  - python
+  - pybedtools
+  - tensorflow

@@ -1,42 +1,47 @@
 import numpy as np
 import pandas as pd
-import gzip
 import click
 
-import os
+from sequence import SeqCNNDataLoader1D
+
+from model import standard, simplified
 
 import tensorflow as tf
 
+model_type = {
+    "standard": standard,
+    "simplified": simplified,
+}
 
 # options
 @click.command()
 @click.option(
-    "--seq-train",
-    "seq_train",
+    "--fasta-file",
+    "fasta_file",
     required=True,
     type=click.Path(exists=True, readable=True),
-    help="Training sequences",
+    help="Genome Fasta file",
 )
 @click.option(
-    "--seq-validation",
-    "seq_validation",
+    "--intervals-train",
+    "intervals_train",
     required=True,
     type=click.Path(exists=True, readable=True),
-    help="Validation sequences",
+    help="Intervals and labels for training",
 )
 @click.option(
-    "--labels-train",
-    "labels_train",
+    "--intervals-validation",
+    "intervals_validation",
     required=True,
     type=click.Path(exists=True, readable=True),
-    help="Labels training",
+    help="Intervals and labels for validation",
 )
 @click.option(
-    "--labels-validation",
-    "labels_validation",
-    required=True,
-    type=click.Path(exists=True, readable=True),
-    help="Labels validation",
+    "--model-type",
+    "model_type_str",
+    default="standard",
+    type=click.Choice(model_type.keys(), case_sensitive=False),
+    help="The model that should be used.",
 )
 @click.option(
     "--model",
@@ -81,14 +86,6 @@ import tensorflow as tf
     type=int,
     help="Batch size",
 )
-@click.option(
-    "--label-threshold",
-    "label_threshold",
-    required=False,
-    default=0.8,
-    type=float,
-    help="Positive label threshold",
-)
 @click.option("--epochs", "epochs", required=True, type=int, help="Number of epochs")
 @click.option(
     "--learning-rate", "learning_rate", required=True, type=float, help="Learning rate"
@@ -126,9 +123,10 @@ import tensorflow as tf
               type=int,
               default=None,
               help='seed for randomness.'
-)
-
-def cli(seq_train, seq_validation, labels_train, labels_validation, fit_log_file, model_file, weights_file, acc_file, pred_file, batch_size, label_threshold, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed):
+              )
+def cli(
+    fasta_file, intervals_train, intervals_validation, model_type_str, fit_log_file, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed
+):
     """
     Train a model for the given sequences and labels.
     """
@@ -136,25 +134,6 @@ def cli(seq_train, seq_validation, labels_train, labels_validation, fit_log_file
     if seed is not None:
         np.random.seed(seed)
         tf.random.set_seed(seed)
-
-    # load data
-
-    def loadSingleData(regions,labels):
-        X = []
-        Y = []
-        for region in regions:
-            for sequence in utils.SequenceIO.readFasta(region,skipN=False):
-                X.append(Encoder.one_hot_encode_along_channel_axis(sequence.getSequence()))
-        for label in labels:
-            with gzip.open(label, 'rt') as f:
-                for line in f:
-                    lineSplit = line.split("\t")[6:]
-                    if line.startswith("#"):
-                        labelNames=lineSplit
-                    else:
-                        Y.append(list(map(lambda x: 1.0 if float(x)>=label_threshold else 0.0,lineSplit)))
-
-        return(np.array(X),np.array(Y))
 
     strategy = tf.distribute.MirroredStrategy(devices=None)
 
@@ -167,50 +146,38 @@ def cli(seq_train, seq_validation, labels_train, labels_validation, fit_log_file
 
         return learning_rate
 
+    dl = SeqCNNDataLoader1D(intervals_file=intervals_train, fasta_file=fasta_file, label_dtype=int)
+
+    dl_val = SeqCNNDataLoader1D(intervals_file=intervals_validation, fasta_file=fasta_file, label_dtype=int)
+
     # train model
-    X_train, Y_train = loadSingleData(seq_train,labels_train)
-    X_validation, Y_validation = loadSingleData(seq_validation,labels_validation)
+    train_data = dl.load_all()
+    val_data = dl_val.load_all()
 
     with strategy.scope():
 
-        inputs = Input(shape=(300,4), name="input")
-        layer = Conv1D(250, kernel_size=7, strides=1,activation='relu', name="conv1")(inputs)
-        layer = BatchNormalization()(layer)
-        layer = Conv1D(250, 8, strides=1, activation='softmax', name="conv2")(layer)
-        layer = BatchNormalization()(layer)
-        layer = MaxPooling1D(pool_size=2, strides=None, name="maxpool1")(layer)
-        layer = Dropout(0.1)(layer)
-        layer = Conv1D(250, 3, strides=1, activation='softmax', name="conv3")(layer)
-        layer = BatchNormalization()(layer)
-        layer = Conv1D(100, 2, strides=1, activation='softmax',name="conv4")(layer)
-        layer = BatchNormalization()(layer)
-        layer = MaxPooling1D(pool_size=1, strides=None, name="maxpool2")(layer)
-        layer = Dropout(0.1)(layer)
-        layer = Flatten()(layer)
-        layer = Dense(300, activation='sigmoid')(layer)
-        layer = Dropout(0.3)(layer)
-        layer = Dense(200, activation='sigmoid')(layer)
-        predictions = Dense(np.shape(train_Y)[1], activation='linear')(layer)
-        model = Model(inputs=inputs, outputs=predictions)
+        model = model_type[model_type_str](
+            val_data["inputs"].shape, val_data["targets"].shape
+        )
 
         # defining callbacks
         call_backs = []
 
-        csvLogger = callbacks.CSVLogger(fit_log_file, separator="\t", append=False)
+        csvLogger = tf.keras.callbacks.CSVLogger(fit_log_file, separator="\t", append=False)
 
         call_backs.append(csvLogger)
 
-        lr_callback = callbacks.LearningRateScheduler(lr_schedule)
+        lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
         if learning_rate_sheduler:
             call_backs.append(lr_callback)
 
-        earlyStopping_callback = callbacks.EarlyStopping(
+        earlyStopping_callback = tf.keras.callbacks.EarlyStopping(
             patience=10, restore_best_weights=True
         )
         if early_stopping:
             call_backs.append(earlyStopping_callback)
 
-        optimizer = optimizers.Adam(learning_rate=learning_rate)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         if loss == "Poission":  # use_poisson_loss:
             model.compile(
@@ -240,9 +207,9 @@ def cli(seq_train, seq_validation, labels_train, labels_validation, fit_log_file
         print("Fit model")
 
         result = model.fit(
-            X_train,
-            Y_train,
-            validation_data=(X_validation, Y_validation),
+            train_data["inputs"],
+            train_data["targets"],
+            validation_data=(val_data["inputs"], val_data["targets"]),
             batch_size=batch_size,
             epochs=epochs,
             shuffle=True,
@@ -259,11 +226,14 @@ def cli(seq_train, seq_validation, labels_train, labels_validation, fit_log_file
 
         if pred_file:
             print("Final prediction")
-            preds = model.predict(X_validation)
+            preds = model.predict(val_data["inputs"])
             pd.DataFrame(preds).to_csv(pred_file, sep="\t", index=False)
 
         print("Final evaluation")
-        eval = model.evaluate(X_validation, Y_validation),
+        eval = model.evaluate(val_data["inputs"], val_data["targets"])
         pd.DataFrame(eval).to_csv(acc_file, sep="\t", index=False, header=None)
 
         print("Done")
+
+if __name__ == "__main__":
+    cli()

@@ -27,6 +27,7 @@ rule all:
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
         expand(
-            "results/sequence_selection/sequence.annotated_bidirectional.{dataset}.fa.gz",
+            "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
             dataset=["test", "training", "validation"],
         ),
+        "results/training/model.json",

@@ -171,10 +171,16 @@ rule sequence_selection_training_regions:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.training.bed.gz",
+    params:
+        positiveLabelThreshold=0.8,
     log:
         "logs/sequence_selection/training_regions.log",
     shell:
-        "zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | bgzip -c > {output}"
+        """
+        zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | \
+        awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
+        bgzip -c > {output}
+        """
 
 
 rule sequence_selection_validation_regions:
@@ -184,10 +190,16 @@ rule sequence_selection_validation_regions:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.validation.bed.gz",
+    params:
+        positiveLabelThreshold=0.8,
     log:
         "logs/sequence_selection/validation_regions.log",
     shell:
-        "zcat {input} | egrep '^chr18' | bgzip -c > {output}"
+        """
+        zcat {input} | egrep '^chr18' | \
+        awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
+        bgzip -c > {output}
+        """
 
 
 rule sequence_selection_test_regions:
@@ -197,10 +209,16 @@ rule sequence_selection_test_regions:
         "results/sequence_selection/regions.annotated.all.bed.gz",
     output:
         "results/sequence_selection/regions.annotated.test.bed.gz",
+    params:
+        positiveLabelThreshold=0.8,
     log:
         "logs/sequence_selection/test_regions.log",
     shell:
-        "zcat {input} | egrep '^chr8' | bgzip -c > {output}"
+        """
+        zcat {input} | egrep '^chr8' | \
+        awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
+        bgzip -c > {output}
+        """
 
 
 # bidirectional

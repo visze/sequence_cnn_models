@@ -1,0 +1,16 @@
+---
+__default__:
+  time: "0-00:10"
+  threads: 1
+  mem: 2G
+  queue: debug
+  error: "logs/%x_%j_%N.err"
+  output: "logs/%x_%j_%N.log"
+################
+### features ###
+################
+training_multitask:
+  time: "5-00:00"
+  mem: 30G
+  threads: 25
+  queue: gpu --gres=gpu:tesla:2
