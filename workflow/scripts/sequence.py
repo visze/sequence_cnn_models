@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import math
+from pyfaidx import Fasta
 from copy import deepcopy
 from kipoi.metadata import GenomicRanges
 from kipoi.data import Dataset, kipoi_dataloader
@@ -70,7 +70,7 @@ class BedDataset(object):
                                 header=None,
                                 nrows=1,
                                 sep='\t')
-        
+
         found_columns = df_peek.shape[1]
         self.n_tasks = found_columns - self.bed_columns
         if self.n_tasks < 0:
@@ -225,12 +225,6 @@ class StringCNNDataLoader1D(Dataset):
             output_schema.targets = None
         return output_schema
 
-    def get_targets(self):
-        if self.label_stop_column == None:
-            return self.df.iloc[:, self.label_start_column:].values.astype(self.label_dtype)
-        else:
-            return self.df.iloc[:, self.label_start_column:self.label_stop_column].values.astype(self.label_dtype)
-
     @classmethod
     def get_output_schema(cls):
         output_schema = deepcopy(cls.output_schema)
@@ -238,6 +232,65 @@ class StringCNNDataLoader1D(Dataset):
         ignore_targets = kwargs['ignore_targets']
         if ignore_targets:
             output_schema.targets = None
+        return output_schema
+
+
+@kipoi_dataloader(override={"dependencies": deps, 'info.authors': package_authors})
+class StringFastaLoader1D(Dataset):
+    """
+    info:
+        doc: >
+            Dataloader for a Fasta file without any class labels.
+    args:
+        fasta_file:
+            doc: TODO
+            example:
+              url: TODO
+              md5: TODO
+        force_upper:
+            doc: Force uppercase output of sequences
+        length:
+            doc: Adding Ns at the beginning/end of the sequence to fit the length.
+    output_schema:
+        inputs:
+            name: seq
+            shape: ()
+            doc: DNA sequence as string
+            special_type: DNAStringSeq
+    """
+
+    def __init__(self,
+                 fasta_file,
+                 force_upper=True,
+                 length=300):
+
+        self.fasta_file = fasta_file
+        self.length = length
+        self.force_upper = force_upper
+
+        self.fasta = Fasta(self.fasta_file)
+
+    def __len__(self):
+        return len(self.fasta.keys())
+
+    def __getitem__(self, idx):
+
+        # Run the fasta extractor and transform if necessary
+        seq = self.fasta[idx][0:self.length].seq
+
+        if len(seq) <= self.length:
+            seq = seq + 'N' * (self.length - len(seq))
+
+        return {
+            "inputs": np.array(seq),
+            "metadata": {
+            }
+        }
+
+    @classmethod
+    def get_output_schema(cls):
+        output_schema = deepcopy(cls.output_schema)
+        output_schema.targets = None
         return output_schema
 
 
@@ -341,5 +394,88 @@ class SeqCNNDataLoader1D(Dataset):
         # (optionally) get rid of the target shape
         if kwargs['ignore_targets']:
             output_schema.targets = None
+
+        return output_schema
+
+
+@kipoi_dataloader(override={"dependencies": deps, 'info.authors': package_authors})
+class SeqFastaLoader1D(Dataset):
+    """
+    info:
+        doc: >
+            Dataloader for a fasta file. Extract sequences from a fasta file and converts them into one-hot encoded
+            format. Returned sequences are of the type np.array with the shape inferred from the arguments: `alphabet_axis`
+            and `dummy_axis`.
+    args:
+        fasta_file:
+            doc: TODO
+            example:
+              url: TODO
+              md5: TODO
+        length:
+            doc: length of the extracted sequence
+        alphabet_axis:
+            doc: axis along which the alphabet runs (e.g. A,C,G,T for DNA)
+        dummy_axis:
+            doc: defines in which dimension a dummy axis should be added. None if no dummy axis is required.
+        alphabet:
+            doc: >
+                alphabet to use for the one-hot encoding. This defines the order of the one-hot encoding.
+                Can either be a list or a string: 'ACGT' or ['A, 'C', 'G', 'T']. Default: 'ACGT'
+        dtype:
+            doc: 'defines the numpy dtype of the returned array. Example: int, np.int32, np.float32, float'
+    output_schema:
+        inputs:
+            name: seq
+            shape: (None, 4)
+            doc: One-hot encoded DNA sequence
+            special_type: DNASeq
+    """
+
+    def __init__(self,
+                 fasta_file,
+                 length=300,
+                 alphabet_axis=1,
+                 dummy_axis=None,
+                 alphabet="ACGT",
+                 dtype=None):
+
+        # core dataset, not using the one-hot encoding params
+        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length)
+
+        self.input_transform = ReorderedOneHot(alphabet=alphabet,
+                                               dtype=dtype,
+                                               alphabet_axis=alphabet_axis,
+                                               dummy_axis=dummy_axis)
+
+    def __len__(self):
+        return len(self.seq_dl)
+
+    def __getitem__(self, idx):
+        ret = self.seq_dl[idx]
+        ret['inputs'] = self.input_transform(str(ret["inputs"]))
+        return ret
+
+    @classmethod
+    def get_output_schema(cls):
+        """
+        Get the output schema. Overrides the default `cls.output_schema`
+        """
+        output_schema = deepcopy(cls.output_schema)
+
+        # get the default kwargs
+        kwargs = default_kwargs(cls)
+
+        # figure out the input shape
+        mock_input_transform = ReorderedOneHot(alphabet=kwargs['alphabet'],
+                                               dtype=kwargs['dtype'],
+                                               alphabet_axis=kwargs['alphabet_axis'],
+                                               dummy_axis=kwargs['dummy_axis'])
+        input_shape = mock_input_transform.get_output_shape()
+
+        # modify it
+        output_schema.inputs.shape = input_shape
+
+        output_schema.targets = None
 
         return output_schema
