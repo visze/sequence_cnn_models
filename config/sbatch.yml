@@ -13,4 +13,4 @@ training_multitask:
   time: "5-00:00"
   mem: 30G
   threads: 25
-  queue: gpu --gres=gpu:tesla:2
+  queue: gpu --gres=gpu:tesla:4

@@ -3,8 +3,8 @@
 seed: 42
 wrapper_directory: path/to/wrapper_directory
 reference:
-  genome: path/to/genome.file
-  fasta: path/to/genome.fasta
+  genome: /github/workspace/resources/example.fa.genome
+  fasta: /github/workspace/resources/example.fa
 input:
   length: 300
   merge: 50

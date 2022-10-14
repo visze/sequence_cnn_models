@@ -1,3 +1,3 @@
 sample	region_file
-A	A.bed.gz
-B	B.bed.gz
+A	resources/A.bed.gz
+B	resources/B.bed.gz
