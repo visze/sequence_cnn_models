@@ -3,10 +3,11 @@
 seed: 42
 wrapper_directory: path/to/wrapper_directory
 reference:
-  genome: /github/workspace/resources/example.fa.genome
-  fasta: /github/workspace/resources/example.fa
+  genome: resources/example.fa.genome
+  fasta: resources/example.fa
 input:
   length: 300
   merge: 50
   sliding: 50
-samples: /github/workspace/config/samples.tsv
+samples: config/samples.tsv
+tests: config/tests.tsv
