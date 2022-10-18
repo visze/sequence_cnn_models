@@ -35,7 +35,6 @@ tests.index.names = ["test_id"]
 validate(tests, schema="../schemas/tests.schema.yaml")
 
 
-
 def getWrapper(wrapper):
     """
     Get directory for snakemake wrappers.

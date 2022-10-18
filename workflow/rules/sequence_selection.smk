@@ -225,7 +225,8 @@ rule sequence_selection_test_regions:
 
 
 rule sequence_selection_bidirectional:
-    conda: "../envs/default.yml"
+    conda:
+        "../envs/default.yml"
     input:
         "results/sequence_selection/regions.annotated.{dataset}.bed.gz",
     output:

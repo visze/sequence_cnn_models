@@ -1,6 +1,6 @@
 ---
 __default__:
-  time: "0-00:10"
+  time: "0-00:20"
   threads: 1
   mem: 2G
   queue: debug
@@ -10,7 +10,14 @@ sequence_selection_negative_background_widnows:
   time: "0-01:00"
   threads: 1
   mem: 10G
-  queue: debug
+sequence_selection_negative_background_input:
+  time: "0-01:00"
+  threads: 1
+  mem: 10G
+sequence_selection_negative_background_sampler:
+  time: "0-01:00"
+  threads: 1
+  mem: 20G
 training_multitask:
   time: "5-00:00"
   mem: 30G

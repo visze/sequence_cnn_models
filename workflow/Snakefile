@@ -33,6 +33,6 @@ rule all:
         ),
         "results/training/model.json",
         expand(
-            "results/predictions/{test_name}.tsv.gz",
+            "results/predictions/{test_name}.labeled.tsv.gz",
             test_name=list(tests.index),
-        )
+        ),

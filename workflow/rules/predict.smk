@@ -21,3 +21,21 @@ rule predict_fromFasta:
         --sequence-length {params.length} \
         --output {output} > {log}
         """
+
+
+rule predict_add_labels:
+    conda:
+        "../envs/default.yml"
+    input:
+        "results/predictions/{test_name}.tsv.gz",
+    output:
+        "results/predictions/{test_name}.labeled.tsv.gz",
+    params:
+        labels="\\t".join(["id"] + list(samples.index) + ["gc_matched_background"]),
+    log:
+        "logs/predict/add_labels.{test_name}.log",
+    shell:
+        """
+        (echo -e "{params.labels}"; zcat {input}) | \
+        gzip -c > {output}  2> {log}
+        """
