@@ -30,7 +30,10 @@ samples = pd.read_csv(config["samples"], sep="\t").set_index("sample", drop=Fals
 samples.index.names = ["sample_id"]
 validate(samples, schema="../schemas/samples.schema.yaml")
 
-print(samples)
+tests = pd.read_csv(config["tests"], sep="\t").set_index("test", drop=False)
+tests.index.names = ["test_id"]
+validate(tests, schema="../schemas/tests.schema.yaml")
+
 
 
 def getWrapper(wrapper):

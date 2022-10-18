@@ -55,7 +55,7 @@ def cli(test_fasta_file, model_file, weights_file, output_file, sequence_length)
 
         print("Final prediction")
         preds = model.predict(test_data["inputs"])
-        pd.DataFrame(preds).to_csv(output_file, sep='\t', header=None, index=False)
+        pd.DataFrame(preds, test_data["metadata"]["id"]).to_csv(output_file, sep='\t', header=None, index=True)
 
 
 if __name__ == '__main__':

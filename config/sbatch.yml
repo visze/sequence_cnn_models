@@ -6,11 +6,18 @@ __default__:
   queue: debug
   error: "logs/%x_%j_%N.err"
   output: "logs/%x_%j_%N.log"
-################
-### features ###
-################
+sequence_selection_negative_background_widnows:
+  time: "0-01:00"
+  threads: 1
+  mem: 10G
+  queue: debug
 training_multitask:
   time: "5-00:00"
   mem: 30G
   threads: 25
   queue: gpu --gres=gpu:tesla:4
+predict_fromFasta:
+  time: "0-01:00"
+  mem: 30G
+  threads: 1
+  queue: gpu --gres=gpu:tesla:1

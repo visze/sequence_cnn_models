@@ -277,13 +277,14 @@ class StringFastaLoader1D(Dataset):
 
         # Run the fasta extractor and transform if necessary
         seq = self.fasta[idx][0:self.length].seq
-
+        name = self.fasta[idx][0:self.length].name
         if len(seq) <= self.length:
             seq = seq + 'N' * (self.length - len(seq))
 
         return {
             "inputs": np.array(seq),
             "metadata": {
+                "id": name
             }
         }
 

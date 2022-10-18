@@ -1,0 +1,19 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+
+description: an entry in the sample sheet
+
+type: object
+
+# columns that the config/samples.tsv file can have and which type they should be
+properties:
+  test:
+    type: string
+    description: test name/identifier
+  file:
+    type: string
+    description: Path to the test file. (fa.gz)
+
+# columns that the config/samples.tsv file must have to pass schema validation
+required:
+  - test
+  - file

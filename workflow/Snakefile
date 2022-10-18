@@ -20,6 +20,7 @@ include: "rules/common.smk"
 include: "rules/sequence_selection_common.smk"
 include: "rules/sequence_selection.smk"
 include: "rules/training.smk"
+include: "rules/predict.smk"
 
 
 rule all:
@@ -31,3 +32,7 @@ rule all:
             dataset=["test", "training", "validation"],
         ),
         "results/training/model.json",
+        expand(
+            "results/predictions/{test_name}.tsv.gz",
+            test_name=list(tests.index),
+        )

@@ -38,6 +38,8 @@ properties:
       - sliding
   samples:
     type: string
+  tests:
+    type: string
 
 # entries that have to be in the config file for successful validation
 required:
