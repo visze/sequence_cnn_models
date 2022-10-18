@@ -10,3 +10,4 @@ input:
   merge: 50
   sliding: 50
 samples: config/samples.tsv
+tests: config/tests.tsv
