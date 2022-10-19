@@ -66,7 +66,7 @@ jobs:
       - name: Test workflow
         uses: snakemake/snakemake-github-action@v1.24.0
         with:
-          directory: .test
+          directory: .
           snakefile: workflow/Snakefile
           args: "--configfile config/config_github.yml --use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache"
 
