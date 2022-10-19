@@ -58,7 +58,8 @@ jobs:
       - Linting
       - Formatting
     steps:
-      - uses: actions/checkout@v3
+      - name: wrapper directory
+        uses: actions/checkout@v3
         with:
           repository: kircherlab/snakemake_wrappers
           path: wrappers
