@@ -1,13 +1,13 @@
 ---
 # config file for github actions
 seed: 42
-wrapper_directory: path/to/wrapper_directory
+wrapper_directory: $GITHUB_WORKSPACE/wrappers
 reference:
-  genome: /github/workspace/resources/example.fa.genome
-  fasta: /github/workspace/resources/example.fa
+  genome: $GITHUB_WORKSPACE/resources/example.fa.genome
+  fasta: $GITHUB_WORKSPACE/resources/example.fa
 input:
   length: 300
   merge: 50
   sliding: 50
-samples: /github/workspace/config/samples_github.tsv
-tests: /github/workspace/config/tests_github.tsv
+samples: $GITHUB_WORKSPACE/config/samples_github.tsv
+tests: $GITHUB_WORKSPACE/config/tests_github.tsv
