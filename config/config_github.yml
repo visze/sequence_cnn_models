@@ -9,5 +9,5 @@ input:
   length: 300
   merge: 50
   sliding: 50
-samples: /github/workspace/config/samples.tsv
-tests: /github/workspace/config/tests.tsv
+samples: /github/workspace/config/samples_github.tsv
+tests: /github/workspace/config/tests_github.tsv
