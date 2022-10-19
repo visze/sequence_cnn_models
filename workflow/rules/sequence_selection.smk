@@ -21,7 +21,7 @@ rule sequence_selection_overlap_regions:
         awk -v "OFS=\\t" '{{if ($2==$3) $3=$3+1; print $0}}' | \
         bedtools slop -g {input.genome} -s -l `echo "({params.length} / 2)" | \
         bc` -r `echo "(({params.length} / 2) - 1)" | bc`  | \
-        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.region}
+        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.region} 2> {log}
         """
 
 
@@ -44,7 +44,7 @@ rule sequence_selection_annotate_overlap:
         awk -v "OFS=\\t" '{{if ($2==$3) $3=$3+1; print $0}}' | \
         bedtools slop -g {input.genome} -s -l `echo "({params.length} / 2)" | \
         bc` -r `echo "(({params.length} / 2) - 1)" | bc`  | \
-        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.region}
+        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.region} 2> {log}
         """
 
 
@@ -114,7 +114,7 @@ rule sequence_selection_negative_background_final:
         """
         zcat {input} | \
         awk -v 'OFS=\\t' '{{if ($4==0){{print $1,$2,$3,".",".","+"}}}}' | \
-        bgzip -c > {output}
+        bgzip -c > {output} 2> {log}
         """
 
 
@@ -133,7 +133,7 @@ rule sequence_selection_create_regions_file:
         "logs/sequence_selection/create_regions_file.log",
     shell:
         """
-        zcat {input} | sort -k1,1 -k2,2n | uniq | bgzip -c > {output}
+        zcat {input} | sort -k1,1 -k2,2n | uniq | bgzip -c > {output} 2> {log}
         """
 
 
@@ -157,7 +157,7 @@ rule sequence_selection_annotate_regions:
     shell:
         """
         bedtools annotate -i {input.regions} -files {input.samples} {input.negative} -names "{params.names}" | \
-        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.regions}
+        sort -k1,1 -k2,2n | uniq | bgzip -c > {output.regions} 2> {log}
         """
 
 
@@ -179,7 +179,7 @@ rule sequence_selection_training_regions:
         """
         zcat {input} | egrep -v '^chr8' | egrep -v '^chr18' | egrep -v '^chrM' | \
         awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
-        bgzip -c > {output}
+        bgzip -c > {output} 2>{log}
         """
 
 
@@ -198,7 +198,7 @@ rule sequence_selection_validation_regions:
         """
         zcat {input} | egrep '^chr18' | \
         awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
-        bgzip -c > {output}
+        bgzip -c > {output} 2>{log}
         """
 
 
@@ -217,7 +217,7 @@ rule sequence_selection_test_regions:
         """
         zcat {input} | egrep '^chr8' | \
         awk -v "OFS=\\t" '{{for(i=7; i<=NF; i++) {{if($i>={params.positiveLabelThreshold}){{ $i=1 }} else {{$i=0}}}}; print $0}}' | \
-        bgzip -c > {output}
+        bgzip -c > {output} 2>{log}
         """
 
 
@@ -238,7 +238,7 @@ rule sequence_selection_bidirectional:
         (
             zcat {input} | awk -v "OFS=\\t" '{{$6="+";print$0}}'; \
             zcat {input} | awk -v "OFS=\\t" '{{$6="-";print$0}}';
-        ) | sort -k1,1 -k2,2n | bgzip -c > {output}
+        ) | sort -k1,1 -k2,2n | bgzip -c > {output} 2>{log}
         """
 
 
@@ -257,5 +257,5 @@ rule sequence_selection_extract_fasta:
         "logs/sequence_selection/extract_fasta.{dataset}.log",
     shell:
         """
-        bedtools getfasta -s -fi {input.reference} -bed {input.regions} | bgzip -c > {output.sequences}
+        bedtools getfasta -s -fi {input.reference} -bed {input.regions} | bgzip -c > {output.sequences} 2> {log}
         """
