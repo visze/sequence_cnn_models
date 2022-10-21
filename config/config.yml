@@ -1,12 +1,12 @@
 ---
 # config file for github actions
 seed: 42
-wrapper_directory: path/to/wrapper_directory
+wrapper_directory: /data/gpfs-1/users/schubacm_c/work/projects/snakemake_wrappers
 reference:
-  genome: path/to/genome.file
-  fasta: path/to/genome.fasta
+  genome: resources/example.fa.genome
+  fasta: resources/example.fa
 input:
-  length: 300
+  length: 200
   merge: 50
   sliding: 50
 samples: config/samples.tsv

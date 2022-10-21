@@ -1,12 +1,9 @@
+import click
 import numpy as np
 import pandas as pd
-import click
-
-from sequence import SeqCNNDataLoader1D
-
-from model import standard, simplified
-
 import tensorflow as tf
+from model import simplified, standard
+from sequence import SeqClassificationDataLoader1D, SeqRegressionDataLoader1D
 
 model_type = {
     "standard": standard,
@@ -14,27 +11,29 @@ model_type = {
 }
 
 # options
+
+
 @click.command()
 @click.option(
     "--fasta-file",
     "fasta_file",
-    required=True,
+    required=False,
     type=click.Path(exists=True, readable=True),
     help="Genome Fasta file",
 )
 @click.option(
-    "--intervals-train",
-    "intervals_train",
+    "--train-input",
+    "train_input_file",
     required=True,
     type=click.Path(exists=True, readable=True),
-    help="Intervals and labels for training",
+    help="Intervals and labels for training/regression input",
 )
 @click.option(
-    "--intervals-validation",
-    "intervals_validation",
+    "--validation-input",
+    "validation_input_file",
     required=True,
     type=click.Path(exists=True, readable=True),
-    help="Intervals and labels for validation",
+    help="Intervals and labels for validation/regression input",
 )
 @click.option(
     "--model-type",
@@ -42,6 +41,20 @@ model_type = {
     default="standard",
     type=click.Choice(model_type.keys(), case_sensitive=False),
     help="The model that should be used.",
+)
+@click.option(
+    "--model-mode",
+    "model_mode",
+    type=click.Choice(
+        [
+            "classification",
+            "regression",
+        ],
+        case_sensitive=False,
+    ),
+    default='classification',
+    required=False,
+    help="Choise of model type",
 )
 @click.option(
     "--model",
@@ -125,7 +138,7 @@ model_type = {
               help='seed for randomness.'
               )
 def cli(
-    fasta_file, intervals_train, intervals_validation, model_type_str, fit_log_file, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed
+    fasta_file, train_input_file, validation_input_file, model_type_str, fit_log_file, model_mode, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed
 ):
     """
     Train a model for the given sequences and labels.
@@ -146,9 +159,12 @@ def cli(
 
         return learning_rate
 
-    dl = SeqCNNDataLoader1D(intervals_file=intervals_train, fasta_file=fasta_file, label_dtype=int)
-
-    dl_val = SeqCNNDataLoader1D(intervals_file=intervals_validation, fasta_file=fasta_file, label_dtype=int)
+    if model_mode == 'regression':
+        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float)
+        dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float)
+    elif model_mode == 'classification':
+        dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file, label_dtype=int)
+        dl_val = SeqClassificationDataLoader1D(intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int)
 
     # train model
     train_data = dl.load_all()
@@ -234,6 +250,7 @@ def cli(
         pd.DataFrame(eval).to_csv(acc_file, sep="\t", index=False, header=None)
 
         print("Done")
+
 
 if __name__ == "__main__":
     cli()

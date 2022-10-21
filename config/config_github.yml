@@ -6,7 +6,7 @@ reference:
   genome: /github/workspace/resources/example.fa.genome
   fasta: /github/workspace/resources/example.fa
 input:
-  length: 300
+  length: 200
   merge: 50
   sliding: 50
 samples: /github/workspace/config/samples_github.tsv

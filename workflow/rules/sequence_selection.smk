@@ -232,12 +232,12 @@ rule sequence_selection_bidirectional:
     output:
         "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
     log:
-        "logs/sequence_selection/bidirectional..{dataset}.log",
+        "logs/sequence_selection/bidirectional.{dataset}.log",
     shell:
         """
         (
-            zcat {input} | awk -v "OFS=\\t" '{{$6="+";print$0}}'; \
-            zcat {input} | awk -v "OFS=\\t" '{{$6="-";print$0}}';
+            zcat {input} | egrep -v "^#" | awk -v "OFS=\\t" '{{$6="+";print$0}}'; \
+            zcat {input} | egrep -v "^#" | awk -v "OFS=\\t" '{{$6="-";print$0}}';
         ) | sort -k1,1 -k2,2n | bgzip -c > {output} 2>{log}
         """
 
