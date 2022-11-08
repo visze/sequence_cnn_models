@@ -24,7 +24,17 @@ training_multitask:
   threads: 25
   queue: gpu --gres=gpu:tesla:4
 predict_fromFasta:
-  time: "0-01:00"
+  time: "0-02:00"
   mem: 30G
   threads: 1
   queue: gpu --gres=gpu:tesla:1
+training_regression:
+    time: "1-00:00"
+    mem: 30G
+    threads: 25
+    queue: gpu --gres=gpu:tesla:1
+predict_regression:
+    time: "0-02:00"
+    mem: 30G
+    threads: 1
+    queue: gpu --gres=gpu:tesla:1

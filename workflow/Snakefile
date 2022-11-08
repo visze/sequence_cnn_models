@@ -1,6 +1,8 @@
 # The main entry point of your workflow.
 # After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
 
+import itertools
+
 
 report: "report/workflow.rst"
 
@@ -19,20 +21,52 @@ min_version("7.15.2")
 include: "rules/common.smk"
 include: "rules/sequence_selection_common.smk"
 include: "rules/sequence_selection.smk"
+include: "rules/regression_input.smk"
 include: "rules/training.smk"
 include: "rules/predict.smk"
 
 
-rule all:
-    input:
-        # The first rule should define the default target files
-        # Subsequent target rules can be specified below. They should start with all_*.
-        expand(
-            "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
-            dataset=["test", "training", "validation"],
-        ),
-        "results/training/model.json",
-        expand(
-            "results/predictions/{test_name}.labeled.tsv.gz",
-            test_name=list(tests.index),
-        ),
+if not isRegression():
+
+    rule all:
+        input:
+            expand(
+                "results/sequence_selection/regions.annotated_bidirectional.{dataset}.bed.gz",
+                dataset=["test", "training", "validation"],
+            ),
+            "results/training/model.json",
+            expand(
+                "results/predictions/{test_name}.labeled.tsv.gz",
+                test_name=list(tests.index),
+            ),
+
+
+if isRegression():
+
+    rule all:
+        input:
+            "results/regression_input/regression.tsv.gz",
+            expand(
+                "results/regression_input/regression.training.{test_fold}.{validation_fold}.tsv.gz",
+                zip,
+                test_fold=getTestFolds(10),
+                validation_fold=getValidationFolds(10),
+            ),
+            expand(
+                "results/regression_input/regression.validation.{test_fold}.{validation_fold}.tsv.gz",
+                zip,
+                test_fold=getTestFolds(10),
+                validation_fold=getValidationFolds(10),
+            ),
+            expand(
+                "results/regression_input/regression.test.{test_fold}.{validation_fold}.tsv.gz",
+                zip,
+                test_fold=getTestFolds(10),
+                validation_fold=getValidationFolds(10),
+            ),
+            expand(
+                "results/training/model.regression.{test_fold}.{validation_fold}.json",
+                zip,
+                test_fold=getTestFolds(10),
+                validation_fold=getValidationFolds(10),
+            ),
