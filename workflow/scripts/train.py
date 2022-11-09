@@ -160,8 +160,8 @@ def cli(
         return learning_rate
 
     if model_mode == 'regression':
-        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=True)
-        dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float, augment=True)
+        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=True, augment_on=(16,215))
+        dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float, augment=True,  augment_on=(16,215))
     elif model_mode == 'classification':
         dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file, label_dtype=int)
         dl_val = SeqClassificationDataLoader1D(intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int)

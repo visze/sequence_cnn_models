@@ -24,6 +24,7 @@ include: "rules/sequence_selection.smk"
 include: "rules/regression_input.smk"
 include: "rules/training.smk"
 include: "rules/predict.smk"
+include: "rules/correlation.smk"
 
 
 if not isRegression():

@@ -13,7 +13,6 @@ from kipoiseq.transforms import ReorderedOneHot
 from kipoiseq.transforms import functional as F
 
 
-
 deps = Dependencies(conda=['numpy', 'pandas', 'kipoiseq'])
 
 package_authors = [Author(name='Max Schubach', github='visze')]
@@ -505,6 +504,8 @@ class StringRegressionDataLoader1D(Dataset):
             doc: start column of labvels. 0 based indexing
         augment:
             doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         force_upper:
             doc: Force uppercase output of sequences
         ignore_targets:
@@ -526,12 +527,14 @@ class StringRegressionDataLoader1D(Dataset):
                  force_upper=True,
                  label_dtype=None,
                  augment=False,
+                 augment_on=None,
                  ignore_targets=False):
 
         self.tsv_file = tsv_file
         self.label_dtype = label_dtype
         self.force_upper = force_upper
         self.augment = augment
+        self.augment_on = augment_on
         self.label_start_column = label_start_column
         self.ignore_targets = ignore_targets
 
@@ -555,7 +558,11 @@ class StringRegressionDataLoader1D(Dataset):
 
         seq = row.iloc[1]
         if reverseComplement:
-            seq = F.rc_dna(seq)
+            if not self.augment_on:
+                seq = seq[:self.augment_on[0]-1] + \
+                    F.rc_dna(seq[self.augment_on[0]-1, self.augment_on[1]]) + seq[self.augment_on[1]:]
+            else:
+                seq = F.rc_dna(seq)
 
         name = row.iloc[0]
 
@@ -611,6 +618,8 @@ class SeqRegressionDataLoader1D(Dataset):
             doc: axis along which the alphabet runs (e.g. A,C,G,T for DNA)
         augment:
             doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         dummy_axis:
             doc: defines in which dimension a dummy axis should be added. None if no dummy axis is required.
         alphabet:
@@ -637,6 +646,7 @@ class SeqRegressionDataLoader1D(Dataset):
                  label_dtype=None,
                  label_start_column=1,
                  augment=False,
+                 augment_on=None,
                  alphabet_axis=1,
                  dummy_axis=None,
                  alphabet="ACGT",
@@ -645,7 +655,7 @@ class SeqRegressionDataLoader1D(Dataset):
         # core dataset, not using the one-hot encoding params
         self.seq_dl = StringRegressionDataLoader1D(tsv_file, label_dtype=label_dtype,
                                                    label_start_column=label_start_column, augment=augment,
-                                                   ignore_targets=ignore_targets)
+                                                   augment_on=augment_on, ignore_targets=ignore_targets)
 
         self.input_transform = ReorderedOneHot(alphabet=alphabet,
                                                dtype=dtype,

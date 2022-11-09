@@ -90,7 +90,7 @@ if isRegression():
             "results/predictions/mean.{test_fold}.tsv.gz",
         params:
             columns=lambda wc: getValidationFoldsForTest(wc.test_fold, 10),
-            new_columns=["MEAN", "STD"],
+            new_columns=["MEAN_prediction", "STD_prediction"],
             operations=["mean", "std"],
         log:
             "logs/predict/regression_mean.{test_fold}.log",
@@ -106,5 +106,18 @@ if isRegression():
             "results/predictions/finalConcat.tsv.gz",
         log:
             "logs/predict/regression_finalConcat.log",
+        wrapper:
+            getWrapper("file_manipulation/concat")
+
+    rule predict_regression_labels:
+        input:
+            labels=config["input"]["labels"],
+            prediction="results/predictions/finalConcat.tsv.gz",
+        output:
+            "results/predictions/finalConcat.labels.tsv.gz",
+        params:
+            index="ID",
+        log:
+            "logs/predict/regression_labels.log",
         wrapper:
             getWrapper("file_manipulation/concat")

@@ -38,7 +38,7 @@ def cli(test_file, model_file, weights_file, output_file, prediction_name):
 
     strategy = tf.distribute.MirroredStrategy(devices=None)
 
-    dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=True, ignore_targets=True)
+    dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=True, augment_on=(16,215), ignore_targets=True)
 
     test_data = dl_test.load_all()
 
