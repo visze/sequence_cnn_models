@@ -10,6 +10,18 @@ properties:
     type: integer
   wrapper_directory:
     type: string
+  training:
+    type: object
+    properties:
+      model:
+        type: string
+        enum: [standard, simplified, saluki]
+        default: standard
+      loss:
+        type: string
+        enum: [MSE, Huber, Poission, CategoricalCrossentropy]
+        default: MSE
+    default: {}
   reference:
     type: object
     properties:

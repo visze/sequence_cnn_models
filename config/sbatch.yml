@@ -29,7 +29,7 @@ predict_fromFasta:
   threads: 1
   queue: gpu --gres=gpu:tesla:1
 training_regression:
-    time: "1-00:00"
+    time: "0-20:00"
     mem: 30G
     threads: 25
     queue: gpu --gres=gpu:tesla:1
@@ -37,4 +37,24 @@ predict_regression:
     time: "0-02:00"
     mem: 30G
     threads: 1
+    queue: gpu --gres=gpu:tesla:1
+model_interpretation_runBackgroundSampler:
+  time: "0-10:00"
+  threads: 4
+  mem: 80G
+  queue: medium
+model_interpretation_deepexplain:
+    time: "1-00:00"
+    mem: 30G
+    threads: 25
+    queue: gpu --gres=gpu:tesla:1
+model_interpretation_deeplift:
+    time: "1-00:00"
+    mem: 30G
+    threads: 25
+    queue: gpu --gres=gpu:tesla:1
+model_interpretation_ism:
+    time: "1-00:00"
+    mem: 30G
+    threads: 25
     queue: gpu --gres=gpu:tesla:1

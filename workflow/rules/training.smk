@@ -17,6 +17,8 @@ if not isRegression():
             epochs=100,
             batchSize=128,
             learningRate=0.001,
+            loss=config["training"]["loss"],
+            model=config["training"]["model"],
             lrSheduler="--no-learning-rate-sheduler",
             earlyStopping="--use-early-stopping",
         conda:
@@ -28,9 +30,11 @@ if not isRegression():
             --fasta-file {input.fasta_file} \
             --train-input {input.intervals_train} --validation-input {input.intervals_validation} \
             --model-mode classification \
+            --model-type {params.model} \
             --model {output.model} --weights {output.weights} \
             --val-acc {output.validation_acc} \
             --fit-log {output.fit_log} \
+            --loss {params.loss} \
             --batch-size {params.batchSize} --epochs {params.epochs} \
             --learning-rate {params.learningRate} \
             {params.lrSheduler} \
@@ -56,6 +60,8 @@ else:
             epochs=100,
             batchSize=128,
             learningRate=0.001,
+            loss=config["training"]["loss"],
+            model=config["training"]["model"],
             lrSheduler="--no-learning-rate-sheduler",
             earlyStopping="--use-early-stopping",
         conda:
@@ -65,10 +71,12 @@ else:
             """
             python {input.script} \
             --train-input {input.train} --validation-input {input.validation} \
+            --model-type {params.model} \
             --model-mode regression \
             --model {output.model} --weights {output.weights} \
             --val-acc {output.validation_acc} \
             --fit-log {output.fit_log} \
+            --loss {params.loss} \
             --batch-size {params.batchSize} --epochs {params.epochs} \
             --learning-rate {params.learningRate} \
             {params.lrSheduler} \

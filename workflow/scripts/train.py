@@ -2,12 +2,13 @@ import click
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from model import simplified, standard
+from model import simplified, standard, saluki
 from sequence import SeqClassificationDataLoader1D, SeqRegressionDataLoader1D
 
 model_type = {
     "standard": standard,
     "simplified": simplified,
+    "saluki": saluki
 }
 
 # options
@@ -160,8 +161,9 @@ def cli(
         return learning_rate
 
     if model_mode == 'regression':
-        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=True, augment_on=(16,215))
-        dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float, augment=True,  augment_on=(16,215))
+        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=True, augment_on=(16, 215))
+        dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float,
+                                           augment=True,  augment_on=(16, 215))
     elif model_mode == 'classification':
         dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file, label_dtype=int)
         dl_val = SeqClassificationDataLoader1D(intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int)
@@ -203,7 +205,7 @@ def cli(
             )
         elif loss == "Huber":  # use_huber_loss:
             model.compile(
-                loss=tf.keras.losses.huber(),
+                loss=tf.keras.losses.Huber(),
                 metrics=["mse", "mae", "mape", "acc"],
                 optimizer=optimizer,
             )

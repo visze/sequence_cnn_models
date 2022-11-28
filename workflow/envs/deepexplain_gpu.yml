@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+channel_priority: true
+dependencies:
+  - python
+  - click
+  - kipoi
+  - kipoi-utils
+  - kipoiseq
+  - numpy
+  - pandas
+  - pybedtools
+  - tensorflow<2
+  - keras
+  - pyfaidx
+  - pip
+  - pip:
+    - git+https://github.com/marcoancona/DeepExplain.git#egg=deepexplain
+  # - tensorflow-gpu<2

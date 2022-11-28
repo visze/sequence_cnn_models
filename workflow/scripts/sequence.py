@@ -415,7 +415,7 @@ class SeqFastaLoader1D(Dataset):
               url: TODO
               md5: TODO
         length:
-            doc: length of the extracted sequence
+            doc: Adding Ns at the beginning/end of the sequence to fit the length.
         alphabet_axis:
             doc: axis along which the alphabet runs (e.g. A,C,G,T for DNA)
         dummy_axis:
