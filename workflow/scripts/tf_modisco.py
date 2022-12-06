@@ -37,9 +37,12 @@ def cli(input_file, output_file, output_figures_dir):
     # enerat ethe input. Needing ordererd dicts
     from collections import OrderedDict
     task_to_scores = OrderedDict()
+    print(np.shape(predictions[:, :, :, 0]))
     task_to_scores["task0"] = predictions[:, :, :, 0]
     task_to_hyp_scores = OrderedDict()
     task_to_hyp_scores["task0"] = predictions_normed[:, :, :, 0]
+    print(np.shape(predictions_normed[:, :, :, 0]))
+    exit()
 
     null_per_pos_scores = modisco.coordproducers.LaplaceNullDist(num_to_samp=5000)
     tfmodisco_results = modisco.tfmodisco_workflow.workflow.TfModiscoWorkflow()(

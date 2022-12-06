@@ -1,5 +1,6 @@
 import click
 import pandas as pd
+import numpy as np
 
 from sequence import SeqRegressionDataLoader1D
 
@@ -54,6 +55,9 @@ def cli(test_file, model_file, weights_file, output_file, prediction_name):
 
         print("Final prediction")
         preds = model.predict(test_data["inputs"])
+        # FIXME strange workaround. why saluki model has 3 outputs. Whar are they?
+        if len(np.shape(preds)) == 3:
+            preds = preds[:,0,0]
         preds = pd.DataFrame(preds, test_data["metadata"]["id"])
         preds.index.name = "ID"
         preds = preds.rename(columns={0: prediction_name})

@@ -26,6 +26,7 @@ include: "rules/training.smk"
 include: "rules/predict.smk"
 include: "rules/correlation.smk"
 include: "rules/model_interpretation.smk"
+include: "rules/plot_ism.smk"
 
 
 if not isRegression():

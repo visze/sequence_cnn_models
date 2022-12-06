@@ -203,6 +203,91 @@ rule model_interpretation_ism:
         """
 
 
+## tf-modisco-ism
+rule model_interpretation_ism_concat:
+    conda:
+        "../envs/tfmodisco.yml"
+    input:
+        scores=lambda wc: expand(
+            "results/model_interpretation/ism/scores.{{test_fold}}.{validation_fold}.h5",
+            validation_fold=list(range(1, 11))[: int(wc.test_fold) - 1]
+            + list(range(1, 11))[int(wc.test_fold) :],
+        ),
+        script=getScript("ism_concat.py"),
+    output:
+        hdf5="results/model_interpretation/ism/scores_concat.{test_fold}.h5",
+    log:
+        "logs/model_interpretation/ism_concat.{test_fold}.log",
+    shell:
+        """
+        scores=`for i in {input.scores}; do echo "--scores $i"; done`;
+        python {input.script} \
+        `echo $scores` \
+        --output {output.hdf5}  &> {log}
+        """
+
+
+rule model_interpretation_tfmodisco_ism:
+    conda:
+        "../envs/tfmodisco.yml"
+    input:
+        scores=expand(
+            "results/model_interpretation/ism/scores_concat.{test_fold}.h5",
+            test_fold=list(range(1, 11)),
+        ),
+        script=getScript("tfmodisco_single_task.py"),
+    output:
+        hdf5="results/model_interpretation/ism/tfmodisco/tfmodisco.hdf5",
+    log:
+        "logs/model_interpretation/tfmodisco_ism.log",
+    shell:
+        """
+        scores=`for i in {input.scores}; do echo "--scores $i"; done`;
+        python {input.script} \
+        `echo $scores` \
+        --output {output.hdf5}  &> {log}
+        """
+
+
+rule model_interpretation_tfmodisco_lite_ism:
+    conda:
+        "../envs/tfmodisco-lite.yml"
+    input:
+        scores=expand(
+            "results/model_interpretation/ism/scores_concat.{test_fold}.h5",
+            test_fold=list(range(1, 11)),
+        ),
+        script=getScript("tfmodisco-lite.py"),
+    output:
+        hdf5="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.h5",
+    log:
+        "logs/model_interpretation/tfmodisco_lite_ism.log",
+    shell:
+        """
+        scores=`for i in {input.scores}; do echo "--scores $i"; done`;
+        python {input.script} \
+        `echo $scores` \
+        --output {output.hdf5} --config default  &> {log}
+        """
+
+
+rule model_interpretation_tfmodisco_lite_report_ism:
+    conda:
+        "../envs/tfmodisco-lite.yml"
+    input:
+        seqlets="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.h5",
+        motifs="results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme.txt",
+    output:
+        report="results/model_interpretation/ism/tfmodisco-lite/report/motifs.html",
+        out_dir=directory("results/model_interpretation/ism/tfmodisco-lite/report"),
+    log:
+        "logs/model_interpretation/tfmodisco_lite_report_ism.log",
+    shell:
+        """
+        modisco report -i {input.seqlets} -o {output.out_dir} -m {input.motifs} &> {log}
+        """
+
+
 ## tf-modisco1
 
 
@@ -214,7 +299,9 @@ rule model_interpretation_tfmodisco1:
         script=getScript("tf_modisco.py"),
     output:
         hdf5="results/model_interpretation/ism/tfmodisco/tfModisco.{test_fold}.{validation_fold}.hdf5",
-        fig_dir=directory("results/model_interpretation/ism/tfmodisco/figures.{test_fold}.{validation_fold}/"),
+        fig_dir=directory(
+            "results/model_interpretation/ism/tfmodisco/figures.{test_fold}.{validation_fold}/"
+        ),
     log:
         "logs/model_interpretation/tfmodisco1.{test_fold}.{validation_fold}.log",
     shell:
@@ -236,7 +323,9 @@ rule model_interpretation_tfmodisco2:
     output:
         heatmap="results/model_interpretation/ism/tfmodisco/heatmap.{test_fold}.{validation_fold}.png",
         motifs="results/model_interpretation/ism/tfmodisco/motifs.{test_fold}.{validation_fold}.txt",
-        fig_dir=directory("results/model_interpretation/ism/tfmodisco/figures.{test_fold}.{validation_fold}/"),
+        fig_dir=directory(
+            "results/model_interpretation/ism/tfmodisco/figures.{test_fold}.{validation_fold}/"
+        ),
     log:
         "logs/model_interpretation/tfmodisco2.{test_fold}.{validation_fold}.log",
     shell:
@@ -251,6 +340,7 @@ rule model_interpretation_tfmodisco2:
         --output-heatmap {output.heatmap} \
         --output-figures-dir {output.fig_dir} &> {log}
         """
+
 
 rule model_interpretation_convertToMeme:
     input:
