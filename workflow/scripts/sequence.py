@@ -580,10 +580,7 @@ class StringRegressionDataLoader1D(Dataset):
         }
 
     def get_targets(self):
-        if self.label_stop_column == None:
-            return self.df.iloc[:, self.label_start_column:].values.astype(self.label_dtype)
-        else:
-            return self.df.iloc[:, self.label_start_column:self.label_stop_column].values.astype(self.label_dtype)
+        return self.df.iloc[:, self.label_start_column:].values.astype(self.label_dtype)
 
     @classmethod
     def get_output_schema(cls):
