@@ -1,3 +1,5 @@
+import numpy as np
+
 if not isRegression():
 
     rule predict_fromFasta:
@@ -89,8 +91,20 @@ if isRegression():
         output:
             "results/predictions/mean.{test_fold}.tsv.gz",
         params:
-            columns=lambda wc: getValidationFoldsForTest(wc.test_fold, 10),
-            new_columns=["MEAN_prediction", "STD_prediction"],
+            columns=lambda wc: np.array(
+                expand(
+                    "{fold}.{output}",
+                    fold=getValidationFoldsForTest(wc.test_fold, 10),
+                    output=range(0, config["prediction"]["output_size"]),
+                )
+            ).reshape(9, config["prediction"]["output_size"]),
+            new_columns=lambda wc: np.array(
+                expand(
+                    "{output}.{method}",
+                    method=["MEAN_prediction", "STD_prediction"],
+                    output=range(0, config["prediction"]["output_size"]),
+                )
+            ).reshape(2, config["prediction"]["output_size"]),
             operations=["mean", "std"],
         log:
             "logs/predict/regression_mean.{test_fold}.log",

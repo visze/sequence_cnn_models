@@ -60,11 +60,15 @@ def cli(test_file, model_file, weights_file, output_file, prediction_name):
             preds = preds[:,0,0]
         preds = pd.DataFrame(preds, test_data["metadata"]["id"])
         preds.index.name = "ID"
-        preds = preds.rename(columns={0: prediction_name})
+        for col in preds.columns:
+            preds = preds.rename(columns={col: "%s.%d" % (prediction_name,col) })
         print(preds.head())
+        agg = {}
+        for col in preds.columns:
+            agg[col] = 'mean'
         preds = preds.groupby(level=0)
         print(preds.head())
-        preds = preds.agg({prediction_name:'mean'})
+        preds = preds.agg(agg)
         print(preds.head())
         preds.to_csv(output_file, sep='\t', header=True, index=True)
 

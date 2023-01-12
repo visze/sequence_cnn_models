@@ -12,7 +12,7 @@ rule regression_input_combine_labels:
     shell:
         """
         join -t $'\\t' \
-        <(cat {input.labels} | sed 's/\\r//' | awk -v "OFS=\\t" '{{print $2,$3,$1}}' | sort -k1,1) \
+        <(cat {input.labels} | sed 's/\\r//' | awk -v "OFS=\\t" '{{printf "%s\\t", $2; for(i=3; i<=NF; i++) {{ printf "%s\\t", $i}}; printf "%d\\n", $1}}' | sort -k1,1) \
         <(
             cat {input.fasta} | \
             awk -v "OFS=\\t" '/^>/ {{printf("%s\\t",substr($1,2));next; }} {{printf("%s\\n",$1);}}' | \
@@ -38,7 +38,13 @@ rule regression_input_get_training:
     shell:
         """
         zcat {input} | \
-        awk -v "OFS=\\t" '{{if ($3 != {params.test_fold} && $3 != {params.validation_fold}) print $1,$4,$2}}' | \
+        awk -v "OFS=\\t" '{{
+            if ($(NF-1) != {params.test_fold} && $(NF-1) != {params.validation_fold}) {{
+                printf "%s\\t%s",$1,$NF;
+                for(i=2; i<(NF-1); i++) {{ printf "\\t%s", $i}};
+                printf "\\n"
+            }}
+        }}' | \
         sed 's/\\r//' | \
         gzip -c > {output} 2> {log}
         """
@@ -60,7 +66,13 @@ rule regression_input_get_validation:
     shell:
         """
         zcat {input} | \
-        awk -v "OFS=\\t" '{{if ($3 == {params.validation_fold}) print $1,$4,$2}}' | \
+        awk -v "OFS=\\t" '{{
+            if ($(NF-1) == {params.validation_fold}) {{
+                printf "%s\\t%s",$1,$NF;
+                for(i=2; i<(NF-1); i++) {{ printf "\\t%s", $i}};
+                printf "\\n"
+            }}
+        }}' | \
         sed 's/\\r//' | \
         gzip -c > {output} 2> {log}
         """
@@ -82,7 +94,13 @@ rule regression_input_get_test:
     shell:
         """
         zcat {input} | \
-        awk -v "OFS=\\t" '{{if ($3 == {params.test_fold}) print $1,$4,$2}}' | \
+        awk -v "OFS=\\t" '{{
+            if ($(NF-1) == {params.test_fold}) {{
+                printf "%s\\t%s",$1,$NF;
+                for(i=2; i<(NF-1); i++) {{ printf "\\t%s", $i}};
+                printf "\\n"
+            }}
+        }}' | \
         sed 's/\\r//' | \
         gzip -c > {output} 2> {log}
         """

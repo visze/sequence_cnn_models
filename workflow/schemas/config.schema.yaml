@@ -21,6 +21,36 @@ properties:
         type: string
         enum: [MSE, Huber, Poission, CategoricalCrossentropy]
         default: MSE
+      augmentation:
+        type: boolean
+        default: false
+      augment_on:
+        type: array
+        minitems: 2
+        maxitems: 2
+        items:
+          type: integer
+    default: {}
+  prediction:
+    type: object
+    properties:
+      output_names:
+        type: array
+        items:
+          type: string
+        default: ["MEAN"]
+      output_size:
+        type: integer
+        default: 1
+      augmentation:
+        type: boolean
+        default: false
+      augment_on:
+        type: array
+        minitems: 2
+        maxitems: 2
+        items:
+          type: integer
     default: {}
   reference:
     type: object
@@ -55,6 +85,8 @@ properties:
 
 # entries that have to be in the config file for successful validation
 required:
+  - training
+  - prediction
   - seed
   - wrapper_directory
   - reference

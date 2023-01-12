@@ -93,6 +93,20 @@ model_type = {
     help="Prediction validation output file",
 )
 @click.option(
+    "--use-augmentation/--no-augmentation",
+    "augment",
+    required=False,
+    default=False,
+    help="Augment data using reverse complement",
+)
+@click.option(
+    "--augment-on",
+    "augment_on",
+    required=False,
+    type=(int, int),
+    help="Augment data using reverse complement from given start to stop.",
+)
+@click.option(
     "--batch-size",
     "batch_size",
     required=False,
@@ -139,7 +153,7 @@ model_type = {
               help='seed for randomness.'
               )
 def cli(
-    fasta_file, train_input_file, validation_input_file, model_type_str, fit_log_file, model_mode, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed
+    fasta_file, train_input_file, validation_input_file, model_type_str, fit_log_file, model_mode, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed, use_augmentation ,augment_on
 ):
     """
     Train a model for the given sequences and labels.
@@ -161,9 +175,9 @@ def cli(
         return learning_rate
 
     if model_mode == 'regression':
-        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=True, augment_on=(16, 215))
+        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=use_augmentation, augment_on=augment_on)
         dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float,
-                                           augment=True,  augment_on=(16, 215))
+                                           augment=use_augmentation,  augment_on=augment_on)
     elif model_mode == 'classification':
         dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file, label_dtype=int)
         dl_val = SeqClassificationDataLoader1D(intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int)

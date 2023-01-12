@@ -535,6 +535,8 @@ class StringRegressionDataLoader1D(Dataset):
         self.force_upper = force_upper
         self.augment = augment
         self.augment_on = augment_on
+        if self.augment_on:
+            self.augment = True
         self.label_start_column = label_start_column
         self.ignore_targets = ignore_targets
 
@@ -558,7 +560,8 @@ class StringRegressionDataLoader1D(Dataset):
 
         seq = row.iloc[1]
         if reverseComplement:
-            if not self.augment_on:
+            if self.augment_on:
+                print("HUHUU")
                 seq = seq[:self.augment_on[0]-1] + \
                     F.rc_dna(seq[self.augment_on[0]-1, self.augment_on[1]]) + seq[self.augment_on[1]:]
             else:
