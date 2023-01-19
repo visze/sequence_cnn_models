@@ -73,3 +73,11 @@ if isRegression():
                 test_fold=getTestFolds(10),
                 validation_fold=getValidationFolds(10),
             ),
+            expand(
+                "results/model_interpretation/ism/tfmodisco-lite/report.{target_id}/motifs.html",
+                target_id=list(range(0, config["prediction"]["output_size"])),
+            ),
+            expand(
+                "results/correlation/regression.{target_name}.tsv.gz",
+                target_name=config["prediction"]["output_names"],
+            ),

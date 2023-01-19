@@ -56,6 +56,10 @@ if isRegression():
             temp("results/predictions/prediction.{test_fold}.{validation_fold}.tsv.gz"),
         params:
             prediction_name=lambda wc: wc.validation_fold,
+            augmentation="--use-augmentation"
+            if config["prediction"]["augmentation"] or "augment_on" in config["prediction"]
+            else "--no-augmentation",
+            augment_on="--augment-on %d %d" % (config["prediction"]["augment_on"][0], config["prediction"]["augment_on"][1]) if "augment_on" in config["prediction"] else "",
         log:
             "logs/predict/regression.{test_fold}.{validation_fold}.log",
         conda:
@@ -66,6 +70,7 @@ if isRegression():
             python {input.script} \
             --test {input.test_file} \
             --model {input.model} --weights {input.weights} \
+            {params.augmentation} {params.augment_on} \
             --prediction-name {params.prediction_name} \
             --output {output} &> {log}
             """

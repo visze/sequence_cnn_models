@@ -67,7 +67,13 @@ else:
             augmentation="--use-augmentation"
             if config["training"]["augmentation"] or "augment_on" in config["training"]
             else "--no-augmentation",
-            augment_on=config["training"]["augment_on"] if "augment_on" in config["training"] else "",
+            augment_on="--augment-on %d %d"
+            % (
+                config["training"]["augment_on"][0],
+                config["training"]["augment_on"][1],
+            )
+            if "augment_on" in config["training"]
+            else "",
         conda:
             "../envs/tensorflow.yml"
         threads: 25
@@ -81,7 +87,7 @@ else:
             --val-acc {output.validation_acc} \
             --fit-log {output.fit_log} \
             --loss {params.loss} \
-            {params.augmentation} {params.augment_on}\
+            {params.augmentation} {params.augment_on} \
             --batch-size {params.batchSize} --epochs {params.epochs} \
             --learning-rate {params.learningRate} \
             {params.lrSheduler} \

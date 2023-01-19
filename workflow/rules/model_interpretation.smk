@@ -259,14 +259,17 @@ rule model_interpretation_tfmodisco_lite_ism:
         ),
         script=getScript("tfmodisco-lite.py"),
     output:
-        hdf5="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.h5",
+        hdf5="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.{target_id}.h5",
+    params:
+        target_id=lambda wc: wc.target_id,
     log:
-        "logs/model_interpretation/tfmodisco_lite_ism.log",
+        "logs/model_interpretation/tfmodisco_lite_ism.{target_id}.log",
     shell:
         """
         scores=`for i in {input.scores}; do echo "--scores $i"; done`;
         python {input.script} \
         `echo $scores` \
+        --target-id {params.target_id} \
         --output {output.hdf5} --config default  &> {log}
         """
 
@@ -275,13 +278,15 @@ rule model_interpretation_tfmodisco_lite_report_ism:
     conda:
         "../envs/tfmodisco-lite.yml"
     input:
-        seqlets="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.h5",
+        seqlets="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.{target_id}.h5",
         motifs="results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme.txt",
     output:
-        report="results/model_interpretation/ism/tfmodisco-lite/report/motifs.html",
-        out_dir=directory("results/model_interpretation/ism/tfmodisco-lite/report"),
+        report="results/model_interpretation/ism/tfmodisco-lite/report.{target_id}/motifs.html",
+        out_dir=directory(
+            "results/model_interpretation/ism/tfmodisco-lite/report.{target_id}"
+        ),
     log:
-        "logs/model_interpretation/tfmodisco_lite_report_ism.log",
+        "logs/model_interpretation/tfmodisco_lite_report_ism.{target_id}.log",
     shell:
         """
         modisco report -i {input.seqlets} -o {output.out_dir} -m {input.motifs} &> {log}

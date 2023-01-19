@@ -12,8 +12,6 @@ model_type = {
 }
 
 # options
-
-
 @click.command()
 @click.option(
     "--fasta-file",
@@ -94,7 +92,7 @@ model_type = {
 )
 @click.option(
     "--use-augmentation/--no-augmentation",
-    "augment",
+    "use_augmentation",
     required=False,
     default=False,
     help="Augment data using reverse complement",
@@ -153,7 +151,7 @@ model_type = {
               help='seed for randomness.'
               )
 def cli(
-    fasta_file, train_input_file, validation_input_file, model_type_str, fit_log_file, model_mode, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed, use_augmentation ,augment_on
+    fasta_file, train_input_file, validation_input_file, model_type_str, fit_log_file, model_mode, model_file, weights_file, acc_file, pred_file, batch_size, epochs, learning_rate, learning_rate_sheduler, early_stopping, loss, seed, use_augmentation, augment_on
 ):
     """
     Train a model for the given sequences and labels.

@@ -561,9 +561,8 @@ class StringRegressionDataLoader1D(Dataset):
         seq = row.iloc[1]
         if reverseComplement:
             if self.augment_on:
-                print("HUHUU")
                 seq = seq[:self.augment_on[0]-1] + \
-                    F.rc_dna(seq[self.augment_on[0]-1, self.augment_on[1]]) + seq[self.augment_on[1]:]
+                    F.rc_dna(seq[(self.augment_on[0]-1):self.augment_on[1]]) + seq[self.augment_on[1]:]
             else:
                 seq = F.rc_dna(seq)
 

@@ -25,6 +25,20 @@ import tensorflow as tf
               required=True,
               type=click.Path(exists=True, readable=True),
               help='Weights file')
+@click.option(
+    "--use-augmentation/--no-augmentation",
+    "use_augmentation",
+    required=False,
+    default=False,
+    help="Augment data using reverse complement",
+)
+@click.option(
+    "--augment-on",
+    "augment_on",
+    required=False,
+    type=(int, int),
+    help="Augment data using reverse complement from given start to stop.",
+)
 @click.option('--prediction-name',
                 'prediction_name',
                 required=False,
@@ -35,11 +49,11 @@ import tensorflow as tf
               required=True,
               type=click.Path(writable=True),
               help='Prediction output file')
-def cli(test_file, model_file, weights_file, output_file, prediction_name):
+def cli(test_file, model_file, weights_file, augment_on, use_augmentation, output_file, prediction_name):
 
     strategy = tf.distribute.MirroredStrategy(devices=None)
 
-    dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=True, augment_on=(16,215), ignore_targets=True)
+    dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=use_augmentation, augment_on=augment_on, ignore_targets=True)
 
     test_data = dl_test.load_all()
 
