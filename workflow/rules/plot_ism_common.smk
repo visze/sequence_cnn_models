@@ -13,7 +13,7 @@ satmut = {
         "file": "GRCh38_SORT1.tsv.gz",
         "startPos": 109275091,
         "contig": "chr1",
-    }
+    },
 }
 
 

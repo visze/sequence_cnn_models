@@ -14,7 +14,6 @@ rule plot_ism_get_region:
         "results/plot_ism/input/{region}.fa.gz",
     params:
         region=lambda wc: config["ism_regions"][wc.region],
-
     log:
         "logs/plot_ism/region.{region}.log",
     shell:
