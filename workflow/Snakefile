@@ -26,6 +26,7 @@ include: "rules/training.smk"
 include: "rules/predict.smk"
 include: "rules/correlation.smk"
 include: "rules/model_interpretation.smk"
+include: "rules/plot_ism_common.smk"
 include: "rules/plot_ism.smk"
 
 
@@ -80,4 +81,9 @@ if isRegression():
             expand(
                 "results/correlation/regression.{target_name}.tsv.gz",
                 target_name=config["prediction"]["output_names"],
+            ),
+            expand(
+                "results/plot_ism/plots/{region}.{output}/example_0.pdf",
+                region=config["ism_regions"].keys(),
+                output=range(0, config["prediction"]["output_size"]),
             ),

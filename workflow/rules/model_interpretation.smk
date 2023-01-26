@@ -279,7 +279,7 @@ rule model_interpretation_tfmodisco_lite_report_ism:
         "../envs/tfmodisco-lite.yml"
     input:
         seqlets="results/model_interpretation/ism/tfmodisco-lite/tfmodisco.{target_id}.h5",
-        motifs="results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme.txt",
+        motifs="results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme_nice.txt",
     output:
         report="results/model_interpretation/ism/tfmodisco-lite/report.{target_id}/motifs.html",
         out_dir=directory(
@@ -362,6 +362,18 @@ rule model_interpretation_download_JASPAR2022_CORE_vertebrates_non_redundant:
     shell:
         """
         curl https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme.txt > {output}
+        """
+
+
+rule model_interpretation_convert_nicer_JASPAR2022_CORE_vertebrates_non_redundant:
+    input:
+        "results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme.txt",
+    output:
+        "results/model_interpretation/motifDB/JASPAR2022_CORE_vertebrates_non-redundant_pfms_meme_nice.txt",
+    shell:
+        """
+        cat {input} |
+        awk '{{if ($1=="MOTIF") {{print $1,$2"_"$3,$3}} else {{print $0}}}}' > {output}
         """
 
 

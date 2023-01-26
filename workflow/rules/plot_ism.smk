@@ -1,3 +1,9 @@
+wildcard_constraints:
+    region="[^/.]+",
+    sequence_length="\d+",
+    target="\d+",
+
+
 rule plot_ism_get_region:
     """Retrieve the fasta sequence of a region"""
     conda:
@@ -8,13 +14,13 @@ rule plot_ism_get_region:
         "results/plot_ism/input/{region}.fa.gz",
     params:
         region=lambda wc: config["ism_regions"][wc.region],
+
     log:
-        "logs/plot_ism/region.{region}.log"
+        "logs/plot_ism/region.{region}.log",
     shell:
         """
         samtools faidx {input.ref} {params.region} | bgzip -c > {output}
         """
-
 
 
 rule plot_ism_predict_region:
@@ -96,11 +102,84 @@ rule plot_ism_region:
         scores="results/plot_ism/input/{region}.ism_scores.h5",
         script=getScript("plot_ism.py"),
     output:
-        "results/plot_ism/plots/{region}/example_0.pdf",
-        output_dir=directory("results/plot_ism/plots/{region}"),
+        "results/plot_ism/plots/{region}.{target}/example_0.pdf",
+        output_dir=directory("results/plot_ism/plots/{region}.{target}"),
+    params:
+        target=lambda wc: wc.target,
     log:
-        "logs/plot_ism/region.{region}.log",
+        "logs/plot_ism/region.{region}.{target}.log",
     shell:
         """
-        python {input.script} --score {input.scores} --target 0 --n-plots 0 --output {output.output_dir} &> {log}
+        python {input.script} --score {input.scores} --target {params.target} --n-plots 0 --output {output.output_dir} &> {log}
+        """
+
+
+rule plot_ism_satmut_get_region:
+    """Retrieve the fasta sequence of a region"""
+    conda:
+        "../envs/samtools.yaml"
+    input:
+        ref=config["reference"]["fasta"],
+    output:
+        "results/plot_ism/input/satmut/{region}.{sequence_length}.fa.gz",
+    params:
+        region=lambda wc: "%s:%d-%d"
+        % (
+            getSatMutContig(wc.region),
+            getSatMutStartPos(wc.region),
+            getSatMutStartPos(wc.region) + int(wc.sequence_length) - 1,
+        ),
+    log:
+        "logs/plot_ism/satmut_region.{region}.{sequence_length}.log",
+    shell:
+        """
+        samtools faidx {input.ref} {params.region} | bgzip -c > {output}
+        """
+
+
+rule plot_ism_satmut_create_scores:
+    """Rule to create ISM satmut scores"""
+    conda:
+        "../envs/tensorflow.yml"
+    input:
+        satmut=lambda wc: getSatMutData(wc.region),
+        sequence="results/plot_ism/input/satmut/{region}.{sequence_length}.fa.gz",
+        script=getScript("satMut_toISM.py"),
+    output:
+        output="results/plot_ism/input/satmut/{region}.satmut.{sequence_length}.h5",
+    params:
+        startPos=lambda wc: getSatMutStartPos(wc.region),  #11089283
+    log:
+        "logs/plot_ism/atmut_create_scores.{region}.{sequence_length}.log",
+    shell:
+        """
+        python {input.script} --satmut {input.satmut}  \
+        --start-position {params.startPos} --sequence {input.sequence} \
+        --sequence-length 200 --output {output} &> {log}
+        """
+
+
+rule plot_ism_satmut_plot_scores:
+    """Rule to plot ISM satmut scores"""
+    conda:
+        "../envs/plot_ism_regions.yaml"
+    input:
+        satmut="results/plot_ism/input/satmut/{region}.satmut.{sequence_length}.h5",
+        scores="results/plot_ism/input/{region}.ism_scores.h5",
+        script=getScript("plot_satmut_ism.py"),
+    output:
+        heatmap="results/plot_ism/plots/{region}.{target}/satmut/heatmap.{sequence_length}.pdf",
+        scatter="results/plot_ism/plots/{region}.{target}/satmut/scatter.{sequence_length}.pdf",
+    params:
+        target=lambda wc: wc.target,
+    log:
+        "logs/plot_ism/atmut_create_scores.{region}.{target}.{sequence_length}.log",
+    # wildcard_constraints:
+    #     region="[^.]+",
+    shell:
+        """
+        python {input.script} --satmut {input.satmut} --score {input.scores} \
+        --output-heatmap {output.heatmap} --output-scatter {output.scatter} \
+        --num-bcs 10 --p-value 1e-5 \
+         --target {params.target} &> {log}
         """
