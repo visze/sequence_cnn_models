@@ -8,6 +8,7 @@ analysis/*
 !docs/*
 !resources
 !resources/*
+!resources/satmut_examples/*
 !.github
 !.github/**
 !workflow
