@@ -190,7 +190,7 @@ rule plot_satmut_combine_predictions_splits:
         """
 
 
-rule plot_satmut_plot_scores:
+rule plot_satmut_plot_scores_sign:
     """Rule to plot ISM satmut scores"""
     conda:
         "../../envs/plot_ism_regions.yaml"
@@ -199,20 +199,42 @@ rule plot_satmut_plot_scores:
         scores="results/plot/satmut/input/{region}.ism_scores.h5",
         script=getScript("plot_satmut_ism.py"),
     output:
-        heatmap="results/plot/satmut/{region}.{target}/heatmap.pdf",
-        scatter="results/plot/satmut/{region}.{target}/scatter.pdf",
+        heatmap="results/plot/satmut/{region}.{target}/heatmap.sign.pdf",
+        scatter="results/plot/satmut/{region}.{target}/scatter.sign.pdf",
     params:
         target=lambda wc: wc.target,
         startPos=lambda wc: getSatMutStartPos(wc.region),
     log:
-        "logs/plot/satmut/plot_scores.{region}.{target}.log",
-    # wildcard_constraints:
-    #     region="[^.]+",
+        "logs/plot/satmut/plot_scores_sign.{region}.{target}.log",
     shell:
         """
         python {input.script} --satmut {input.satmut} --score {input.scores} \
         --output-heatmap {output.heatmap} --output-scatter {output.scatter} \
         --num-bcs 10 --p-value 1e-5 \
+        --start {params.startPos} \
+         --target {params.target} &> {log}
+        """
+
+rule plot_satmut_plot_scores_all:
+    """Rule to plot ISM satmut scores"""
+    conda:
+        "../../envs/plot_ism_regions.yaml"
+    input:
+        satmut="results/plot/satmut/input/{region}.satmut.h5",
+        scores="results/plot/satmut/input/{region}.ism_scores.h5",
+        script=getScript("plot_satmut_ism.py"),
+    output:
+        heatmap="results/plot/satmut/{region}.{target}/heatmap.all.pdf",
+        scatter="results/plot/satmut/{region}.{target}/scatter.all.pdf",
+    params:
+        target=lambda wc: wc.target,
+        startPos=lambda wc: getSatMutStartPos(wc.region),
+    log:
+        "logs/plot/satmut/plot_scores_all.{region}.{target}.log",
+    shell:
+        """
+        python {input.script} --satmut {input.satmut} --score {input.scores} \
+        --output-heatmap {output.heatmap} --output-scatter {output.scatter} \
         --start {params.startPos} \
          --target {params.target} &> {log}
         """

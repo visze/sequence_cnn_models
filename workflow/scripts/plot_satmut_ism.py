@@ -129,7 +129,7 @@ def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, outp
     df = pd.DataFrame({'SatMut': satmut_scores_tmp.flatten(), 'ISM': ism_delta_ti.flatten()})
     p_corr = df.corr()
     f = sns.scatterplot(x="SatMut", y="ISM", data=df, size=1,linewidth=0, legend=False)
-    plt.text(0, 0, "Pearson corr %.2f" % p_corr.iloc[0,1], 
+    plt.text(-0.2, 0.6, "Pearson corr. %.2f" % p_corr.iloc[0,1], 
         horizontalalignment='center', verticalalignment="top", fontsize=12, 
         color='black', fontweight='bold')
     f.figure.savefig(output_scatter, format="pdf")
