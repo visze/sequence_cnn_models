@@ -68,3 +68,8 @@ model_interpretation_tfmodisco_lite_ism:
     mem: 30G
     threads: 30
     queue: medium
+plot_satmut_predict_region:
+    time: "0-00:10"
+    mem: 10G
+    threads: 1
+    queue: gpu --gres=gpu:tesla:1

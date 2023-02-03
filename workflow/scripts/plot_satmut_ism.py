@@ -37,6 +37,12 @@ import pandas as pd
               default=0,
               type=int,
               help='Prediction index of scores to plot')
+@click.option('--start',
+              'start_pos',
+              required=False,
+              default=0,
+              type=int,
+              help='X axis start position')
 @click.option('--output-heatmap',
               'output_heatmap',
               required=True,
@@ -47,7 +53,7 @@ import pandas as pd
               required=True,
               type=click.Path(writable=True),
               help='Scatterplot output file')
-def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, output_scatter, target_idx):
+def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, output_scatter, target_idx, start_pos):
     # take the scores
     click.echo('Loading data...')
 
@@ -55,6 +61,7 @@ def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, outp
 
     h5 = h5py.File(satmut_file, 'r')
     seqs_satmut = h5['seqs'][:][0]
+    seqlen = len(seqs_satmut[:])
     scores_satmut = h5['satmut'][:, :, :, 0][0]
     p_value = h5['satmut'][:, :, :, 1][0] <= pvalue_threshold
     bcs = h5['satmut'][:, :, :, 2][0] >= num_bcs
@@ -63,16 +70,14 @@ def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, outp
     h5.close()
 
     h5 = h5py.File(score_file, 'r')
-    seqs_score = h5['seqs'][:][0]
-    scores_ism = h5['ism'][:, :, :, target_idx][0]
+    seqs_score = h5['seqs'][:seqlen]
+    scores_ism = h5['ism'][:seqlen, :, target_idx]
     h5.close()
 
     if not np.any(seqs_score==seqs_satmut):
         raise ValueError('Sequences do not match')
 
-
-
-    seqlen = 200
+    
     plot_start = 0
     plot_end = seqlen
 
@@ -106,14 +111,15 @@ def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, outp
     f, axs = plt.subplots(figsize=(40, 10), nrows=10, ncols=1)
     plot_seqlogo(axs[0], seqs_tmp, satmut_delta_mean, pseudo_pct=0)  # plot seqlogo, mean
     plot_seqlogo(axs[1], seqs_tmp, ism_delta_mean, pseudo_pct=0)  # plot seqlogo, mean
-    plot_seqlogo(axs[2], seqs_tmp, -ism_loss, pseudo_pct=0)  # plot seqlogo, loss
-    plot_seqlogo(axs[3], seqs_tmp, -satmut_loss, pseudo_pct=0)  # plot seqlogo, loss
+    plot_seqlogo(axs[2], seqs_tmp, -satmut_loss, pseudo_pct=0)  # plot seqlogo, loss
+    plot_seqlogo(axs[3], seqs_tmp, -ism_loss, pseudo_pct=0)  # plot seqlogo, loss
     plot_seqlogo(axs[4], seqs_tmp, satmut_gain, pseudo_pct=0)  # plot seqlogo, gain
     plot_seqlogo(axs[5], seqs_tmp, ism_gain, pseudo_pct=0)  # plot seqlogo, gain
     plot_sad(axs[6], satmut_loss, satmut_gain)  # plot loss and gain
     plot_sad(axs[7], ism_loss, ism_gain)  # plot loss and gain
     plot_heat(axs[8], satmut_scores_tmp.T, 0.01)  # , cbar=False plot heatmap
     plot_heat(axs[9], ism_delta_ti.T, 0.01)  # , cbar=False plot heatmap
+    
     plt.tight_layout()
 
     
@@ -121,12 +127,13 @@ def cli(score_file, satmut_file, output_heatmap, pvalue_threshold, num_bcs, outp
     plt.close()
 
     df = pd.DataFrame({'SatMut': satmut_scores_tmp.flatten(), 'ISM': ism_delta_ti.flatten()})
-    print(df.corr())
-    f = sns.scatterplot(x="SatMut", y="ISM", data=df)
+    p_corr = df.corr()
+    f = sns.scatterplot(x="SatMut", y="ISM", data=df, size=1,linewidth=0, legend=False)
+    plt.text(0, 0, "Pearson corr %.2f" % p_corr.iloc[0,1], 
+        horizontalalignment='center', verticalalignment="top", fontsize=12, 
+        color='black', fontweight='bold')
     f.figure.savefig(output_scatter, format="pdf")
     plt.close()
-
-    
 
 
 def plot_heat(ax, sat_delta_ti, min_limit, cbar=False):

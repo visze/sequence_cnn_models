@@ -19,22 +19,22 @@ import os
               required=True,
               type=int,
               help='Start position in the human genome.')
+@click.option('--end-position',
+              'end_pos',
+              required=True,
+              type=int,
+              help='End position in the human genome.')
 @click.option('--sequence',
               'sequence_file',
               required=True,
               type=click.Path(exists=True, readable=True),
               help='Fasta sequence of reference file')
-@click.option('--sequence-length',
-              'sequence_length',
-              required=True,
-              type=int,
-              help='Length of the original sequence in FASTA file')
 @click.option('--output',
               'output_file',
               required=True,
               type=click.Path(writable=True),
               help='Output file')
-def cli(satmut_file, sequence_file, start_pos, sequence_length, output_file):
+def cli(satmut_file, sequence_file, start_pos, end_pos, output_file):
 
     from sequence import SeqFastaLoader1D, StringFastaLoader1D
     import pandas as pd
@@ -43,6 +43,7 @@ def cli(satmut_file, sequence_file, start_pos, sequence_length, output_file):
     # ISM sequences
     print("load sequences")
     # construct dataset
+    sequence_length = end_pos - start_pos + 1
     dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length)
 
     eval_data = dl_eval.load_all()

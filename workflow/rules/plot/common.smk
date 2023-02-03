@@ -4,14 +4,10 @@ satmut = {
         "startPos": 11089283,
         "contig": "chr19",
     },
-    "SORT1_1": {
+    "SORT1": {
         "file": "GRCh38_SORT1.tsv.gz",
-        "startPos": 109274800,
-        "contig": "chr1",
-    },
-    "SORT1_2": {
-        "file": "GRCh38_SORT1.tsv.gz",
-        "startPos": 109275091,
+        "startPos": 109274652,
+        "endPos": 109275251,
         "contig": "chr1",
     },
 }
@@ -29,6 +25,13 @@ def getSatMutStartPos(region):
     Return the start position of a satmut data for a given region
     """
     return satmut[region]["startPos"]
+
+
+def getSatMutEndPos(region):
+    """
+    Return the end position of a satmut data for a given region
+    """
+    return satmut[region]["endPos"]
 
 
 def getSatMutContig(region):
