@@ -271,10 +271,13 @@ rule plot_satmut:
         script=getScript("plot_satmut.R"),
     output:
         "results/plot/satmut/{region}.{target}/satmut.pdf",
+    params:
+        region=lambda wc: wc.region
     log:
         "logs/plot/satmut/plot_satmut.{region}.{target}.log",
     shell:
         """
         Rscript {input.script} --input {input.scores} \
+        --region {params.region} \
         --output {output}  &> {log}
         """

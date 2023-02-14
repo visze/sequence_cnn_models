@@ -83,9 +83,16 @@ if isRegression():
                 "results/correlation/regression.{target_name}.tsv.gz",
                 target_name=config["prediction"]["output_names"],
             ),
+            "results/predictions/finalConcat.labels.cleaned.tsv.gz",
             expand(
                 "results/plot/satmut/{region}.{target}/{plot}.pdf",
-                plot=["heatmap.all", "heatmap.sign", "scatter.all", "scatter.sign", "satmut"],
+                plot=[
+                    "heatmap.all",
+                    "heatmap.sign",
+                    "scatter.all",
+                    "scatter.sign",
+                    "satmut",
+                ],
                 region=satmut.keys(),
                 target=range(0, config["prediction"]["output_size"]),
             ),

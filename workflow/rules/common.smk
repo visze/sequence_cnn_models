@@ -82,3 +82,15 @@ def getValidationFoldsForTest(test_fold, bins):
     output = list(range(1, bins + 1))
     output.remove(int(test_fold))
     return output
+
+
+def getlabelsForRename():
+    """
+    rename prediction columns to get a nice output
+    """
+    out = {}
+    for i, name in enumerate(config["prediction"]["output_names"]):
+        out[name] = "%s_MPRA" % name
+        out["%d.MEAN_prediction" % i] = "%s_MPRAnn" % name
+        out["%d.STD_prediction" % i] = "%s_STD_MPRAnn" % name
+    return out

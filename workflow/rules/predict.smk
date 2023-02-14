@@ -57,9 +57,16 @@ if isRegression():
         params:
             prediction_name=lambda wc: wc.validation_fold,
             augmentation="--use-augmentation"
-            if config["prediction"]["augmentation"] or "augment_on" in config["prediction"]
+            if config["prediction"]["augmentation"]
+            or "augment_on" in config["prediction"]
             else "--no-augmentation",
-            augment_on="--augment-on %d %d" % (config["prediction"]["augment_on"][0], config["prediction"]["augment_on"][1]) if "augment_on" in config["prediction"] else "",
+            augment_on="--augment-on %d %d"
+            % (
+                config["prediction"]["augment_on"][0],
+                config["prediction"]["augment_on"][1],
+            )
+            if "augment_on" in config["prediction"]
+            else "",
         log:
             "logs/predict/regression.{test_fold}.{validation_fold}.log",
         conda:
@@ -140,3 +147,27 @@ if isRegression():
             "logs/predict/regression_labels.log",
         wrapper:
             getWrapper("file_manipulation/concat")
+
+    rule predict_regression_labels_rename:
+        input:
+            "results/predictions/finalConcat.labels.tsv.gz",
+        output:
+            temp("results/predictions/finalConcat.labels.rename.tsv.gz"),
+        params:
+            columns=getlabelsForRename(),
+        log:
+            "logs/predict/regression_labelss_rename.log",
+        wrapper:
+            getWrapper("file_manipulation/rename")
+
+    rule predict_regression_labels_clean:
+        input:
+            "results/predictions/finalConcat.labels.rename.tsv.gz",
+        output:
+            "results/predictions/finalConcat.labels.cleaned.tsv.gz",
+        params:
+            columns=["ID", "BIN"] + list(getlabelsForRename().values()),
+        log:
+            "logs/predict/regression_labels_clean.log",
+        wrapper:
+            getWrapper("file_manipulation/extract_columns")

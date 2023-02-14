@@ -62,6 +62,9 @@ def cli(score_files, target_id, mspmc, config, output_file):
     seqs = np.concatenate(seqs)
     scores = np.concatenate(scores).astype(np.float32)
 
+    print(scores.shape)
+    print(seqs.shape)
+
     click.echo('Running tfmodisco-lite')
     print(scores.dtype)
     print(seqs.dtype)
