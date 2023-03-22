@@ -88,25 +88,24 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
     # construct dataset
     dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length)
 
-    eval_data = dl_eval.load_all()
+    num_seqs = len(dl_eval)
 
-    num_seqs = len(eval_data["inputs"])
+    it = dl_eval.batch_predict_iter(batch_size=1024)
 
     print("ISM sequences")
-    # make sequence generator
-    seqs_gen = satmut_gen(eval_data, mutation_start, mutation_length)
-
-    seqs = np.array([i for i in seqs_gen], 'float16')
-
-    #################################################################
-    # predict scores, write output
     print("predict scores")
+    # make sequence generator
+     #################################################################
+    # predict scores, write output
+    preds = []
     strategy = tf.distribute.MirroredStrategy(devices=None)
-
     with strategy.scope():
-
-        preds = model.predict(seqs)
-
+        for inputs in it:
+            seqs_gen = satmut_gen(inputs, mutation_start, mutation_length)
+            seqs = np.array([i for i in seqs_gen], 'float16')
+            preds.extend(model.predict(seqs))
+    
+    preds = np.array(preds)
     num_targets = preds.shape[1]
 
     #################################################################
@@ -129,6 +128,7 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
     pi = 0
 
     print("combine scores")
+    eval_data = dl_eval.load_all()
     for seq_1hotc in eval_data["inputs"]:
 
         # write reference sequence
@@ -174,7 +174,7 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
     scores_h5.close()
 
 
-def satmut_gen(eval_data, mut_start, mut_len):
+def satmut_gen(seq_data, mut_start, mut_len):
     """Construct generator for 1 hot encoded saturation
        mutagenesis DNA sequences."""
 
@@ -182,7 +182,7 @@ def satmut_gen(eval_data, mut_start, mut_len):
     mut_start = mut_start - 1
     mut_end = mut_start + mut_len
 
-    for seq_1hotc in eval_data["inputs"]:
+    for seq_1hotc in seq_data:
         yield seq_1hotc
 
         # for mutation positions

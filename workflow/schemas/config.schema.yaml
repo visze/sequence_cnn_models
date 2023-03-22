@@ -13,14 +13,27 @@ properties:
   training:
     type: object
     properties:
+      folds:
+        type: integer
+        default: 10
       model:
         type: string
-        enum: [standard, simplified, saluki]
+        enum: [standard, simplified, saluki, file]
         default: standard
+      model_files:
+        type: object
+        properties:
+          model:
+            type: string
+          weights:
+            type: string
       loss:
         type: string
         enum: [MSE, Huber, Poission, CategoricalCrossentropy]
         default: MSE
+      batch_size:
+        type: integer
+        default: 1024
       augmentation:
         type: boolean
         default: false
@@ -31,6 +44,16 @@ properties:
         items:
           type: integer
     default: {}
+    allOf:
+      - if:
+          properties:
+            model:
+              const: file
+          required:
+            - model
+        then:
+          required:
+            - model_files
   prediction:
     type: object
     properties:
@@ -51,6 +74,22 @@ properties:
         maxitems: 2
         items:
           type: integer
+      input_size:
+        type: integer
+        default: 230
+    default: {}
+  adapters:
+    type: object
+    properties:
+      left:
+        type: string
+        default: ""
+      right:
+        type: string
+        default: ""
+    required:
+      - left
+      - right
     default: {}
   reference:
     type: object
@@ -65,6 +104,14 @@ properties:
   input:
     type: object
     properties:
+      fasta:
+        anyOf:
+          - type: string
+          - type: object
+            additionalProperties:
+              type: string
+      labels:
+        type: string
       length:
         type: integer
         default: 300
@@ -75,6 +122,7 @@ properties:
         type: integer
         default: 50
     required:
+      - fasta
       - length
       - merge
       - sliding
@@ -82,6 +130,21 @@ properties:
     type: string
   tests:
     type: string
+  satmut:
+    type: object
+    properties:
+      sequence_length:
+        type: integer
+        default: 230
+      step_size:
+        type: integer
+        default: 150
+      mutation_length:
+        type: integer
+        default: 200
+      mutation_start:
+        type: integer
+        default: 16
 
 # entries that have to be in the config file for successful validation
 required:
@@ -90,4 +153,3 @@ required:
   - seed
   - wrapper_directory
   - reference
-  - samples

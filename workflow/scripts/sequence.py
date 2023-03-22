@@ -13,6 +13,41 @@ from kipoiseq.transforms import ReorderedOneHot
 from kipoiseq.transforms import functional as F
 
 
+def _rc_dna(seq):
+    """
+    Reverse complement the DNA sequence
+    >>> assert rc_seq("TATCG") == "CGATA"
+    >>> assert rc_seq("tatcg") == "cgata"
+    """
+    rc_hash = {
+        "A": "T",
+        "T": "A",
+        "C": "G",
+        "G": "C",
+        "Y": "R",
+        "R": "Y",
+        "S": "W",
+        "W": "S",
+        "M": "K",
+        "K": "M",
+        "N": "N",
+        "a": "t",
+        "t": "a",
+        "c": "g",
+        "g": "c",
+        "y": "r",
+        "r": "y",
+        "s": "w",
+        "w": "s",
+        "m": "k",
+        "k": "m",
+        "n": "n"
+    }
+    return "".join([rc_hash[s] for s in reversed(seq)])
+
+
+F.rc_dna = _rc_dna
+
 deps = Dependencies(conda=['numpy', 'pandas', 'kipoiseq'])
 
 package_authors = [Author(name='Max Schubach', github='visze')]
@@ -145,6 +180,10 @@ class StringClassificationDataLoader1D(Dataset):
             example:
               url: TODO
               md5: TODO
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         force_upper:
             doc: Force uppercase output of sequences
         use_strand:
@@ -168,6 +207,8 @@ class StringClassificationDataLoader1D(Dataset):
                  fasta_file,
                  intervals_file,
                  use_strand=True,
+                 augment=False,
+                 augment_on=None,
                  force_upper=True,
                  label_dtype=None,
                  ignore_targets=False):
@@ -176,6 +217,10 @@ class StringClassificationDataLoader1D(Dataset):
         self.intervals_file = intervals_file
         self.label_dtype = label_dtype
         self.use_strand = use_strand,
+        self.augment = augment
+        self.augment_on = augment_on
+        if self.augment_on:
+            self.augment = True
         self.force_upper = force_upper
         self.ignore_targets = ignore_targets
 
@@ -187,9 +232,19 @@ class StringClassificationDataLoader1D(Dataset):
         self.fasta_extractors = None
 
     def __len__(self):
+        if self.augment:
+            return 2 * len(self.bed)
         return len(self.bed)
 
     def __getitem__(self, idx):
+
+        reverseComplement = False
+
+        if self.augment:
+            if (idx % 2 == 1):
+                reverseComplement = True
+            idx = int(idx / 2)
+
         if self.fasta_extractors is None:
             self.fasta_extractors = FastaStringExtractor(
                 self.fasta_file, use_strand=self.use_strand, force_upper=self.force_upper)
@@ -203,6 +258,13 @@ class StringClassificationDataLoader1D(Dataset):
 
         # Run the fasta extractor and transform if necessary
         seq = self.fasta_extractors.extract(interval)
+
+        if reverseComplement:
+            if self.augment_on:
+                seq = seq[:self.augment_on[0]-1] + \
+                    F.rc_dna(seq[(self.augment_on[0]-1):self.augment_on[1]]) + seq[self.augment_on[1]:]
+            else:
+                seq = F.rc_dna(seq)
 
         if self.bed.bed_columns == 6:
             ranges = GenomicRanges(interval.chrom, interval.start, interval.stop, str(idx), interval.strand)
@@ -252,6 +314,10 @@ class StringFastaLoader1D(Dataset):
             doc: Force uppercase output of sequences
         length:
             doc: Adding Ns at the beginning/end of the sequence to fit the length.
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
     output_schema:
         inputs:
             name: seq
@@ -263,24 +329,46 @@ class StringFastaLoader1D(Dataset):
     def __init__(self,
                  fasta_file,
                  force_upper=True,
-                 length=300):
+                 length=300,
+                 augment=False,
+                 augment_on=None):
 
         self.fasta_file = fasta_file
         self.length = length
         self.force_upper = force_upper
+        self.augment = augment
+        self.augment_on = augment_on
+        if self.augment_on:
+            self.augment = True
 
         self.fasta = Fasta(self.fasta_file)
 
     def __len__(self):
+        if self.augment:
+            return 2 * len(self.fasta.keys())
         return len(self.fasta.keys())
 
     def __getitem__(self, idx):
+
+        reverseComplement = False
+
+        if self.augment:
+            if (idx % 2 == 1):
+                reverseComplement = True
+            idx = int(idx / 2)
 
         # Run the fasta extractor and transform if necessary
         seq = self.fasta[idx][0:self.length].seq
         name = self.fasta[idx][0:self.length].name
         if len(seq) <= self.length:
             seq = seq + 'N' * (self.length - len(seq))
+
+        if reverseComplement:
+            if self.augment_on:
+                seq = seq[:self.augment_on[0]-1] + \
+                    F.rc_dna(seq[(self.augment_on[0]-1):self.augment_on[1]]) + seq[self.augment_on[1]:]
+            else:
+                seq = F.rc_dna(seq)
 
         return {
             "inputs": np.array(seq),
@@ -320,6 +408,10 @@ class SeqClassificationDataLoader1D(Dataset):
             doc: 'specific data type for labels, Example: `float` or `np.float32`'
         use_strand:
             doc: 'use strand information from the bed file' 
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         alphabet_axis:
             doc: axis along which the alphabet runs (e.g. A,C,G,T for DNA)
         dummy_axis:
@@ -348,6 +440,8 @@ class SeqClassificationDataLoader1D(Dataset):
                  intervals_file,
                  label_dtype=None,
                  use_strand=False,
+                 augment=False,
+                 augment_on=None,
                  alphabet_axis=1,
                  dummy_axis=None,
                  alphabet="ACGT",
@@ -357,7 +451,8 @@ class SeqClassificationDataLoader1D(Dataset):
         # core dataset, not using the one-hot encoding params
         self.seq_dl = StringClassificationDataLoader1D(fasta_file, intervals_file,
                                                        label_dtype=label_dtype,
-                                                       use_strand=use_strand,
+                                                       use_strand=use_strand,  augment=augment,
+                                                       augment_on=augment_on,
                                                        ignore_targets=ignore_targets)
 
         self.input_transform = ReorderedOneHot(alphabet=alphabet,
@@ -416,6 +511,10 @@ class SeqFastaLoader1D(Dataset):
               md5: TODO
         length:
             doc: Adding Ns at the beginning/end of the sequence to fit the length.
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         alphabet_axis:
             doc: axis along which the alphabet runs (e.g. A,C,G,T for DNA)
         dummy_axis:
@@ -437,13 +536,15 @@ class SeqFastaLoader1D(Dataset):
     def __init__(self,
                  fasta_file,
                  length=300,
+                 augment=False,
+                 augment_on=None,
                  alphabet_axis=1,
                  dummy_axis=None,
                  alphabet="ACGT",
                  dtype=None):
 
         # core dataset, not using the one-hot encoding params
-        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length)
+        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length, augment=augment, augment_on=augment_on)
 
         self.input_transform = ReorderedOneHot(alphabet=alphabet,
                                                dtype=dtype,

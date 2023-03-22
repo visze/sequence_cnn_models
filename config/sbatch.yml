@@ -18,12 +18,12 @@ sequence_selection_negative_background_sampler:
   time: "0-01:00"
   threads: 1
   mem: 20G
-training_multitask:
+training_classification:
   time: "5-00:00"
   mem: 30G
   threads: 25
   queue: gpu --gres=gpu:tesla:4
-predict_fromFasta:
+predict_prediction:
   time: "0-02:00"
   mem: 30G
   threads: 1
@@ -33,6 +33,8 @@ training_regression:
     mem: 30G
     threads: 25
     queue: gpu --gres=gpu:tesla:4
+predict_prediction_finalmean:
+    mem: 15G
 predict_regression:
     time: "0-02:00"
     mem: 30G
@@ -55,9 +57,14 @@ model_interpretation_deeplift:
     queue: gpu --gres=gpu:tesla:1
 model_interpretation_ism:
     time: "1-00:00"
-    mem: 80G
+    mem: 50G
     threads: 25
     queue: gpu --gres=gpu:tesla:1
+model_interpretation_ism_concat:
+    time: "0-01:00"
+    mem: 20G
+    threads: 1
+    queue: medium
 model_interpretation_tfmodisco_ism:
     time: "0-10:00"
     mem: 30G

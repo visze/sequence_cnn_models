@@ -58,7 +58,7 @@ rule plot_satmut_getRegionSplitList:
         "results/plot/satmut/input/ism/{region}.lst",
     params:
         contig=lambda wc: getSatMutContig(wc.region),
-        startPos=lambda wc: getSatMutStartPos(wc.region)-1,
+        startPos=lambda wc: getSatMutStartPos(wc.region) - 1,
         endPos=lambda wc: getSatMutEndPos(wc.region),
         sequence_length=config["satmut"]["sequence_length"],
         step_size=config["satmut"]["step_size"],
@@ -102,16 +102,16 @@ rule plot_satmut_getRegionSplitFasta:
 rule plot_satmut_predict_region:
     """rule to generate ISM scores of a region"""
     input:
-        model="results/training/model.regression.{test_fold}.{validation_fold}.json",
-        weights="results/training/weights.regression.{test_fold}.{validation_fold}.h5",
+        model=lambda wc: getModelPath()["model"],
+        weights=lambda wc: getModelPath()["weights"],
         sequences="results/plot/satmut/input/ism/{region}.fa.gz",
         script=getScript("ism.py"),
     output:
         scores="results/plot/satmut/input/ism/{region}.scores.{test_fold}.{validation_fold}.h5",
     params:
-        sequence_length=230,
-        mutation_length=200,
-        mutation_start=16,
+        sequence_length=config["prediction"]["input_size"],
+        mutation_length=config["satmut"]["mutation_length"],
+        mutation_start=config["satmut"]["mutation_start"],
     log:
         "logs/plot/satmut/predict_region.{region}.{test_fold}.{validation_fold}.log",
     conda:
@@ -131,8 +131,9 @@ rule plot_satmut_combine_predictions_val:
     input:
         scores=lambda wc: expand(
             "results/plot/satmut/input/ism/{{region}}.scores.{{test_fold}}.{validation_fold}.h5",
-            validation_fold=list(range(1, 11))[: int(wc.test_fold) - 1]
-            + list(range(1, 11))[int(wc.test_fold) :],
+            validation_fold=getValidationFoldsForTest(
+                wc.test_fold, config["training"]["folds"]
+            ),
         ),
         script=getScript("ism_concat.py"),
     output:
@@ -154,7 +155,7 @@ rule plot_satmut_combine_predictions_test:
     input:
         scores=lambda wc: expand(
             "results/plot/satmut/input/ism/{{region}}.scores_comb_validation.{test_fold}.h5",
-            test_fold=list(range(1, 11)),
+            test_fold=list(set(getTestFolds(config["training"]["folds"]))),
         ),
         script=getScript("ism_concat.py"),
     output:
@@ -215,6 +216,7 @@ rule plot_satmut_plot_scores_sign:
          --target {params.target} &> {log}
         """
 
+
 rule plot_satmut_plot_scores_all:
     """Rule to plot ISM satmut scores"""
     conda:
@@ -239,6 +241,7 @@ rule plot_satmut_plot_scores_all:
          --target {params.target} &> {log}
         """
 
+
 rule plot_satmut_get_satmut_ism_tsv:
     """Rule to generate a tsv with variants and score"""
     conda:
@@ -262,6 +265,7 @@ rule plot_satmut_get_satmut_ism_tsv:
          --target {params.target} &> {log}
         """
 
+
 rule plot_satmut:
     """Rule to plot ISM satmut scores"""
     conda:
@@ -272,7 +276,7 @@ rule plot_satmut:
     output:
         "results/plot/satmut/{region}.{target}/satmut.pdf",
     params:
-        region=lambda wc: wc.region
+        region=lambda wc: wc.region,
     log:
         "logs/plot/satmut/plot_satmut.{region}.{target}.log",
     shell:

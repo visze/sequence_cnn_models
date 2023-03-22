@@ -12,6 +12,8 @@ model_type = {
 }
 
 # options
+
+
 @click.command()
 @click.option(
     "--fasta-file",
@@ -173,12 +175,15 @@ def cli(
         return learning_rate
 
     if model_mode == 'regression':
-        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float, augment=use_augmentation, augment_on=augment_on)
+        dl = SeqRegressionDataLoader1D(tsv_file=train_input_file, label_dtype=float,
+                                       augment=use_augmentation, augment_on=augment_on)
         dl_val = SeqRegressionDataLoader1D(tsv_file=validation_input_file, label_dtype=float,
                                            augment=use_augmentation,  augment_on=augment_on)
     elif model_mode == 'classification':
-        dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file, label_dtype=int)
-        dl_val = SeqClassificationDataLoader1D(intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int)
+        dl = SeqClassificationDataLoader1D(intervals_file=train_input_file, fasta_file=fasta_file,
+                                           label_dtype=int, augment=use_augmentation, augment_on=augment_on)
+        dl_val = SeqClassificationDataLoader1D(
+            intervals_file=validation_input_file, fasta_file=fasta_file, label_dtype=int, augment=use_augmentation,  augment_on=augment_on)
 
     # train model
     train_data = dl.load_all()
