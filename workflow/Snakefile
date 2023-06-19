@@ -96,6 +96,11 @@ if isRegression():
                 region=satmut.keys(),
                 target=range(0, config["prediction"]["output_size"]),
             ),
+            expand(
+                "results/plot/satmut/correlation/{region}.{target}.tsv.gz",
+                region=satmut.keys(),
+                target=range(0, config["prediction"]["output_size"]),
+            ),
             #expand(
             #    "results/plot_ism/plots/{region}.{output}/example_0.pdf",
             #    region=config["ism_regions"].keys(),

@@ -1,4 +1,4 @@
-$schema: "http://json-schema.org/draft-04/schema#"
+$schema: "https://json-schema.org/draft/2020-12/schema"
 
 description: snakemake configuration file
 
@@ -10,6 +10,19 @@ properties:
     type: integer
   wrapper_directory:
     type: string
+  adapters:
+    type: object
+    properties:
+      left:
+        type: string
+        default: ""
+      right:
+        type: string
+        default: ""
+    required:
+      - left
+      - right
+    default: {}
   training:
     type: object
     properties:
@@ -51,6 +64,24 @@ properties:
         maxitems: 2
         items:
           type: integer
+      mask:
+        type: array
+        items:
+          type: array
+          minitems: 2
+          maxitems: 2
+          items:
+            type: integer
+        default: []
+      sequence_length:
+        type: integer
+        default: 230
+      mutation_length:
+        type: integer
+        default: 200
+      mutation_start:
+        type: integer
+        default: 16
     default: {}
   reference:
     type: object
@@ -90,4 +121,3 @@ required:
   - seed
   - wrapper_directory
   - reference
-  - samples

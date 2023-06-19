@@ -33,9 +33,9 @@ def isRegression():
     return config["regression"]
 
 
-if not isRegression():
-    validate(config, schema="../schemas/config.schema.yaml")
+validate(config, schema="../schemas/config.schema.yaml")
 
+if not isRegression():
     samples = pd.read_csv(config["samples"], sep="\t").set_index("sample", drop=False)
     samples.index.names = ["sample_id"]
     validate(samples, schema="../schemas/samples.schema.yaml")

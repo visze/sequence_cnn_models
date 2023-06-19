@@ -60,7 +60,7 @@ rule model_interpretation_prepareNegativeWindows:
     output:
         "results/model_interpretation/input/background/regression.potentialRegions.bed.gz",
     params:
-        length=230,
+        sequence_length=config["prediction"]["sequence_length"],
         sliding=50,
     wrapper:
         getWrapper("negative_training_sampler/create_windows_over_genome")
@@ -187,9 +187,12 @@ rule model_interpretation_ism:
     output:
         scores="results/model_interpretation/ism/scores.{test_fold}.{validation_fold}.h5",
     params:
-        sequence_length=230,
-        mutation_length=200,
-        mutation_start=16,
+        sequence_length=config["prediction"]["sequence_length"],
+        mutation_length=config["prediction"]["mutation_length"],
+        mutation_start=config["prediction"]["mutation_start"],
+        mask=" ".join(
+            ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
+        ),
     log:
         "logs/model_interpretation/ism.{test_fold}.{validation_fold}.log",
     conda:
@@ -199,6 +202,7 @@ rule model_interpretation_ism:
         python {input.script} \
         --sequence {input.sequences} --sequence-length {params.sequence_length} --mutation-length {params.mutation_length} --mutation-start {params.mutation_start} \
         --model {input.model} --weights {input.weights} \
+        {params.mask} \
         --scores-output {output.scores} &> {log}
         """
 

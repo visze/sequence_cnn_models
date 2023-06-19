@@ -58,7 +58,7 @@ rule plot_satmut_getRegionSplitList:
         "results/plot/satmut/input/ism/{region}.lst",
     params:
         contig=lambda wc: getSatMutContig(wc.region),
-        startPos=lambda wc: getSatMutStartPos(wc.region)-1,
+        startPos=lambda wc: getSatMutStartPos(wc.region) - 1,
         endPos=lambda wc: getSatMutEndPos(wc.region),
         sequence_length=config["satmut"]["sequence_length"],
         step_size=config["satmut"]["step_size"],
@@ -109,9 +109,12 @@ rule plot_satmut_predict_region:
     output:
         scores="results/plot/satmut/input/ism/{region}.scores.{test_fold}.{validation_fold}.h5",
     params:
-        sequence_length=230,
-        mutation_length=200,
-        mutation_start=16,
+        sequence_length=config["prediction"]["sequence_length"],
+        mutation_length=config["prediction"]["mutation_length"],
+        mutation_start=config["prediction"]["mutation_start"],
+        mask=" ".join(
+            ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
+        ),
     log:
         "logs/plot/satmut/predict_region.{region}.{test_fold}.{validation_fold}.log",
     conda:
@@ -121,6 +124,7 @@ rule plot_satmut_predict_region:
         python {input.script} \
         --sequence {input.sequences} --sequence-length {params.sequence_length} --mutation-length {params.mutation_length} --mutation-start {params.mutation_start} \
         --model {input.model} --weights {input.weights} \
+        {params.mask} \
         --scores-output {output.scores} &> {log}
         """
 
@@ -215,6 +219,7 @@ rule plot_satmut_plot_scores_sign:
          --target {params.target} &> {log}
         """
 
+
 rule plot_satmut_plot_scores_all:
     """Rule to plot ISM satmut scores"""
     conda:
@@ -239,6 +244,7 @@ rule plot_satmut_plot_scores_all:
          --target {params.target} &> {log}
         """
 
+
 rule plot_satmut_get_satmut_ism_tsv:
     """Rule to generate a tsv with variants and score"""
     conda:
@@ -262,6 +268,21 @@ rule plot_satmut_get_satmut_ism_tsv:
          --target {params.target} &> {log}
         """
 
+
+rule plot_satmut_correlate:
+    input:
+        a="results/plot/satmut/input/{region}.{target}.tsv.gz",
+    output:
+        "results/plot/satmut/correlation/{region}.{target}.tsv.gz",
+    params:
+        value_a="ISM_delta",
+        value_b="satmut_coefficient",
+    log:
+        "logs/plot/satmut/correlate.{region}.{target}.log",
+    wrapper:
+        getWrapper("evaluate/correlation")
+
+
 rule plot_satmut:
     """Rule to plot ISM satmut scores"""
     conda:
@@ -272,7 +293,7 @@ rule plot_satmut:
     output:
         "results/plot/satmut/{region}.{target}/satmut.pdf",
     params:
-        region=lambda wc: wc.region
+        region=lambda wc: wc.region,
     log:
         "logs/plot/satmut/plot_satmut.{region}.{target}.log",
     shell:

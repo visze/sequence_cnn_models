@@ -61,12 +61,18 @@ Compute in silico mutagenesis of sequences in tfrecords.
               required=True,
               type=click.Path(exists=True, readable=True),
               help='Weights file')
+@click.option('--mask',
+              'mask',
+              required=False,
+              multiple=True,
+              type=(int, int),
+              help='Mask sequence with Ns, from to, 1 based')
 @click.option('--scores-output',
               'scores_h5_file',
               required=True,
               type=click.Path(writable=True),
               help='Scores h5 file')
-def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_file, weights_file, scores_h5_file):
+def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_file, weights_file, mask, scores_h5_file):
 
     print("importing tensorflow")
     from sequence import SeqFastaLoader1D
@@ -86,7 +92,7 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
     # ISM sequences
     print("load sequences")
     # construct dataset
-    dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length)
+    dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length, mask=mask)
 
     eval_data = dl_eval.load_all()
 
