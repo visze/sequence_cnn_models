@@ -27,7 +27,7 @@ rule plot_satmut_get_region:
 rule plot_satmut_create_scores:
     """Rule to create ISM satmut scores"""
     conda:
-        "tf" #"../../envs/tensorflow.yml"
+        "tf"  #"../../envs/tensorflow.yml"
     input:
         satmut=lambda wc: getSatMutData(wc.region),
         sequence="results/plot/satmut/input/{region}.fa.gz",
