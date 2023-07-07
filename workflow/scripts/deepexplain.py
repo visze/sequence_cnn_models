@@ -60,7 +60,7 @@ import numpy as np
               help='Deeplift output file')
 def cli(sequence_file, reference_file, background_file, model_file, weights_file, input_layer, log_file, output_file_intgrad, output_file_deeplift):
 
-    from sequence import SeqFastaLoader1D, SeqClassificationDataLoader1D
+    from lib.sequence import SeqFastaLoader1D, SeqClassificationDataLoader1D
 
     from tensorflow.keras import Model
     import tensorflow as tf

@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import click
 import logging
-from sequence import SeqClassificationDataLoader1D
+from lib.sequence import SeqClassificationDataLoader1D
 
 
 @click.command()

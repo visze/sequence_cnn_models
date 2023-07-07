@@ -252,6 +252,8 @@ class StringFastaLoader1D(Dataset):
             doc: Force uppercase output of sequences
         length:
             doc: Adding Ns at the beginning/end of the sequence to fit the length.
+        mask:
+            doc: 'defines sequences that should be masked using a 2d numpy array of indices (1 based)'
     output_schema:
         inputs:
             name: seq
@@ -263,11 +265,13 @@ class StringFastaLoader1D(Dataset):
     def __init__(self,
                  fasta_file,
                  force_upper=True,
-                 length=300):
+                 length=300,
+                 mask=None):
 
         self.fasta_file = fasta_file
         self.length = length
         self.force_upper = force_upper
+        self.mask = mask
 
         self.fasta = Fasta(self.fasta_file)
 
@@ -281,7 +285,9 @@ class StringFastaLoader1D(Dataset):
         name = self.fasta[idx][0:self.length].name
         if len(seq) <= self.length:
             seq = seq + 'N' * (self.length - len(seq))
-
+        if self.mask:
+            for mask in self.mask:
+                seq = seq[:mask[0]-1] + 'N' * (mask[1] +1 - mask[0]) + seq[mask[1]:] 
         return {
             "inputs": np.array(seq),
             "metadata": {
@@ -426,6 +432,8 @@ class SeqFastaLoader1D(Dataset):
                 Can either be a list or a string: 'ACGT' or ['A, 'C', 'G', 'T']. Default: 'ACGT'
         dtype:
             doc: 'defines the numpy dtype of the returned array. Example: int, np.int32, np.float32, float'
+        mask:
+            doc: 'defines sequences that should be masked using a 2d numpy array of indices'
     output_schema:
         inputs:
             name: seq
@@ -440,10 +448,11 @@ class SeqFastaLoader1D(Dataset):
                  alphabet_axis=1,
                  dummy_axis=None,
                  alphabet="ACGT",
+                 mask=None,
                  dtype=None):
 
         # core dataset, not using the one-hot encoding params
-        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length)
+        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length, mask=mask)
 
         self.input_transform = ReorderedOneHot(alphabet=alphabet,
                                                dtype=dtype,

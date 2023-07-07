@@ -60,7 +60,7 @@ rule model_interpretation_prepareNegativeWindows:
     output:
         "results/model_interpretation/input/background/regression.potentialRegions.bed.gz",
     params:
-        length=230,
+        sequence_length=config["prediction"]["sequence_length"],
         sliding=50,
     wrapper:
         getWrapper("negative_training_sampler/create_windows_over_genome")
@@ -180,25 +180,35 @@ rule model_interpretation_deeplift:
 ### ISM
 rule model_interpretation_ism:
     input:
-        model="results/training/model.regression.{test_fold}.{validation_fold}.json",
-        weights="results/training/weights.regression.{test_fold}.{validation_fold}.h5",
+        model=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["model"],
+        weights=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["weights"],
         sequences="results/model_interpretation/input/regression.test.{test_fold}.{validation_fold}.fa.gz",
         script=getScript("ism.py"),
     output:
         scores="results/model_interpretation/ism/scores.{test_fold}.{validation_fold}.h5",
     params:
-        sequence_length=230,
-        mutation_length=200,
-        mutation_start=16,
+        sequence_length=config["prediction"]["sequence_length"],
+        mutation_length=config["prediction"]["mutation_length"],
+        mutation_start=config["prediction"]["mutation_start"],
+        mask=" ".join(
+            ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
+        ),
+        legnet="--legnet-model"
+        if config["training"]["model"] == "legnet"
+        else "--no-legnet-model",
     log:
         "logs/model_interpretation/ism.{test_fold}.{validation_fold}.log",
     conda:
-        "../envs/tensorflow.yml"
+        "legnet" if config["training"][
+        "model"
+        ] == "legnet" else "../envs/tensorflow.yml"
     shell:
         """
         python {input.script} \
         --sequence {input.sequences} --sequence-length {params.sequence_length} --mutation-length {params.mutation_length} --mutation-start {params.mutation_start} \
         --model {input.model} --weights {input.weights} \
+        {params.legnet} \
+        {params.mask} \
         --scores-output {output.scores} &> {log}
         """
 

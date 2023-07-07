@@ -2,8 +2,8 @@ import click
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from model import simplified, standard, saluki
-from sequence import SeqClassificationDataLoader1D, SeqRegressionDataLoader1D
+from lib.model import simplified, standard, saluki
+from lib.sequence import SeqClassificationDataLoader1D, SeqRegressionDataLoader1D
 
 model_type = {
     "standard": standard,

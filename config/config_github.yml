@@ -2,6 +2,7 @@
 # config file for github actions
 seed: 42
 wrapper_directory: /github/workspace/wrappers
+regression: false
 reference:
   genome: /github/workspace/resources/example.fa.genome
   fasta: /github/workspace/resources/example.fa
