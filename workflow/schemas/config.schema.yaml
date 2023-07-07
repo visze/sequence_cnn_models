@@ -47,16 +47,16 @@ properties:
         #             patternProperties:
         #               ^[0-9]+$:
         #                 type: string
-          # weights:
-          #   oneOf:
-          #     - type: string
-          #     - type: object
-          #       patternProperties:
-          #         ^[0-9]+$:
-          #           type: object
-          #           patternProperties:
-          #             ^[0-9]+$:
-          #               type: string
+        #   weights:
+        #     oneOf:
+        #       - type: string
+        #       - type: object
+        #         patternProperties:
+        #           ^[0-9]+$:
+        #             type: object
+        #             patternProperties:
+        #               ^[0-9]+$:
+        #                 type: string
       loss:
         type: string
         enum: [MSE, Huber, Poission, CategoricalCrossentropy]
