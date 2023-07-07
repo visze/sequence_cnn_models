@@ -180,8 +180,8 @@ rule model_interpretation_deeplift:
 ### ISM
 rule model_interpretation_ism:
     input:
-        model="results/training/model.regression.{test_fold}.{validation_fold}.json",
-        weights="results/training/weights.regression.{test_fold}.{validation_fold}.h5",
+        model=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["model"],
+        weights=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["weights"],
         sequences="results/model_interpretation/input/regression.test.{test_fold}.{validation_fold}.fa.gz",
         script=getScript("ism.py"),
     output:
@@ -193,15 +193,21 @@ rule model_interpretation_ism:
         mask=" ".join(
             ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
         ),
+        legnet="--legnet-model"
+        if config["training"]["model"] == "legnet"
+        else "--no-legnet-model",
     log:
         "logs/model_interpretation/ism.{test_fold}.{validation_fold}.log",
     conda:
-        "../envs/tensorflow.yml"
+        "legnet" if config["training"][
+        "model"
+        ] == "legnet" else "../envs/tensorflow.yml"
     shell:
         """
         python {input.script} \
         --sequence {input.sequences} --sequence-length {params.sequence_length} --mutation-length {params.mutation_length} --mutation-start {params.mutation_start} \
         --model {input.model} --weights {input.weights} \
+        {params.legnet} \
         {params.mask} \
         --scores-output {output.scores} &> {log}
         """

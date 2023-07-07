@@ -18,6 +18,14 @@ from snakemake.utils import min_version
 min_version("7.15.2")
 
 
+module wrappers:
+    """
+    Import wrapper repository.
+    """
+    snakefile:
+        "%s/Snakefile" % config["wrapper_directory"]
+
+
 include: "rules/common.smk"
 include: "rules/sequence_selection_common.smk"
 include: "rules/sequence_selection.smk"
@@ -50,31 +58,7 @@ if isRegression():
 
     rule all:
         input:
-            "results/regression_input/regression.tsv.gz",
-            expand(
-                "results/regression_input/regression.training.{test_fold}.{validation_fold}.tsv.gz",
-                zip,
-                test_fold=getTestFolds(10),
-                validation_fold=getValidationFolds(10),
-            ),
-            expand(
-                "results/regression_input/regression.validation.{test_fold}.{validation_fold}.tsv.gz",
-                zip,
-                test_fold=getTestFolds(10),
-                validation_fold=getValidationFolds(10),
-            ),
-            expand(
-                "results/regression_input/regression.test.{test_fold}.{validation_fold}.tsv.gz",
-                zip,
-                test_fold=getTestFolds(10),
-                validation_fold=getValidationFolds(10),
-            ),
-            expand(
-                "results/training/model.regression.{test_fold}.{validation_fold}.json",
-                zip,
-                test_fold=getTestFolds(10),
-                validation_fold=getValidationFolds(10),
-            ),
+            getRegressionTraining_all(),
             expand(
                 "results/model_interpretation/ism/tfmodisco-lite/report.{target_id}/motifs.html",
                 target_id=list(range(0, config["prediction"]["output_size"])),
@@ -106,3 +90,37 @@ if isRegression():
             #    region=config["ism_regions"].keys(),
             #    output=range(0, config["prediction"]["output_size"]),
             #),
+
+    rule all_model_interpretation:
+        input:
+            expand(
+                "results/model_interpretation/ism/tfmodisco-lite/report.{target_id}/motifs.html",
+                target_id=list(range(0, config["prediction"]["output_size"])),
+            ),
+
+    rule all_correlation:
+        input:
+            expand(
+                "results/correlation/regression.{target_name}.tsv.gz",
+                target_name=config["prediction"]["output_names"],
+            ),
+
+    rule all_satmut:
+        input:
+            expand(
+                "results/plot/satmut/{region}.{target}/{plot}.pdf",
+                plot=[
+                    "heatmap.all",
+                    "heatmap.sign",
+                    "scatter.all",
+                    "scatter.sign",
+                    "satmut",
+                ],
+                region=satmut.keys(),
+                target=range(0, config["prediction"]["output_size"]),
+            ),
+            expand(
+                "results/plot/satmut/correlation/{region}.{target}.tsv.gz",
+                region=satmut.keys(),
+                target=range(0, config["prediction"]["output_size"]),
+            ),

@@ -4,7 +4,7 @@ import logging
 import gzip
 import numpy as np
 import deeplift
-from sequence import SeqFastaLoader1D, SeqClassificationDataLoader1D
+from lib.sequence import SeqFastaLoader1D, SeqClassificationDataLoader1D
 # options
 
 methods = [

@@ -41,7 +41,6 @@ if not isRegression():
             {params.earlyStopping} &> {log}
             """
 
-
 else:
 
     rule training_regression:

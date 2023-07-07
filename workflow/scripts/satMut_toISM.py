@@ -36,7 +36,7 @@ import os
               help='Output file')
 def cli(satmut_file, sequence_file, start_pos, end_pos, output_file):
 
-    from sequence import SeqFastaLoader1D, StringFastaLoader1D
+    from lib.sequence import SeqFastaLoader1D, StringFastaLoader1D
     import pandas as pd
 
     #######################################################

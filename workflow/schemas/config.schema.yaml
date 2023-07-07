@@ -1,3 +1,4 @@
+---
 $schema: "https://json-schema.org/draft/2020-12/schema"
 
 description: snakemake configuration file
@@ -26,10 +27,36 @@ properties:
   training:
     type: object
     properties:
+      folds:
+        type: integer
+        default: 10
       model:
         type: string
-        enum: [standard, simplified, saluki]
+        enum: [standard, simplified, saluki, file, legnet]
         default: standard
+      model_files:
+        type: object
+        # properties:
+        #   model:
+        #     oneOf:
+        #       - type: string
+        #       - type: object
+        #         patternProperties:
+        #           ^[0-9]+$:
+        #             type: object
+        #             patternProperties:
+        #               ^[0-9]+$:
+        #                 type: string
+          # weights:
+          #   oneOf:
+          #     - type: string
+          #     - type: object
+          #       patternProperties:
+          #         ^[0-9]+$:
+          #           type: object
+          #           patternProperties:
+          #             ^[0-9]+$:
+          #               type: string
       loss:
         type: string
         enum: [MSE, Huber, Poission, CategoricalCrossentropy]
@@ -44,6 +71,25 @@ properties:
         items:
           type: integer
     default: {}
+    allOf:
+      - if:
+          properties:
+            model:
+              const: file
+          required:
+            - model
+        then:
+          required:
+            - model_files
+      - if:
+          properties:
+            model:
+              const: legnet
+          required:
+            - model
+        then:
+          required:
+            - model_files
   prediction:
     type: object
     properties:
@@ -96,6 +142,14 @@ properties:
   input:
     type: object
     properties:
+      fasta:
+        anyOf:
+          - type: string
+          - type: object
+            additionalProperties:
+              type: string
+      labels:
+        type: string
       length:
         type: integer
         default: 300

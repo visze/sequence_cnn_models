@@ -67,32 +67,29 @@ Compute in silico mutagenesis of sequences in tfrecords.
               multiple=True,
               type=(int, int),
               help='Mask sequence with Ns, from to, 1 based')
+@click.option(
+    "--legnet-model/--no-legnet-model",
+    "is_legnet_model",
+    required=False,
+    default=False,
+    help="Switch to define if it is a legnet or a classical tensorflwo model",
+)
 @click.option('--scores-output',
               'scores_h5_file',
               required=True,
               type=click.Path(writable=True),
               help='Scores h5 file')
-def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_file, weights_file, mask, scores_h5_file):
+def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_file, weights_file, mask, is_legnet_model, scores_h5_file):
 
-    print("importing tensorflow")
-    from sequence import SeqFastaLoader1D
-    import tensorflow as tf
-
-    #######################################################
-    # model
-    print("load model")
-    json_file = open(model_file, 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-
-    model = tf.keras.models.model_from_json(loaded_model_json)
-    model.load_weights(weights_file)
-
-    #######################################################
     # ISM sequences
     print("load sequences")
     # construct dataset
-    dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length, mask=mask)
+    if is_legnet_model:
+        alphabet = "AGCT"
+    else:
+        alphabet = "ACGT"
+    from lib.sequence import SeqFastaLoader1D
+    dl_eval = SeqFastaLoader1D(sequence_file, length=sequence_length, mask=mask, alphabet=alphabet)
 
     eval_data = dl_eval.load_all()
 
@@ -104,16 +101,26 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
 
     seqs = np.array([i for i in seqs_gen], 'float16')
 
+    print(seqs.shape)
+
     #################################################################
     # predict scores, write output
     print("predict scores")
-    strategy = tf.distribute.MirroredStrategy(devices=None)
+    if is_legnet_model:
+        from lib.prediction_legnet import predict as legnet_predict
+        preds = legnet_predict(model_file, weights_file, seqs)
+    else:
+        from lib.prediction_tf import predict as tf_predict
+        preds = tf_predict(model_file, weights_file, seqs)
+    
+    print(preds)
+    print(preds.shape)
 
-    with strategy.scope():
+    num_targets = preds.shape[1] if len(preds.shape) > 1 else 1
 
-        preds = model.predict(seqs)
+    print(preds)
+    print(preds.shape)
 
-    num_targets = preds.shape[1]
 
     #################################################################
     # setup output
@@ -141,7 +148,11 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
         seq_mut_len = mutation_length
         seq_mut_start = mutation_start-1
         seq_1hot_mut = seq_1hotc[seq_mut_start:seq_mut_start+seq_mut_len]
-        scores_h5['seqs'][si, -seq_mut_len:, :] = seq_1hot_mut.astype('bool')
+        
+        if is_legnet_model:
+            scores_h5['seqs'][si, -seq_mut_len:, :] = seq_1hot_mut[:,[0,2,1,3]].astype('bool')
+        else:
+            scores_h5['seqs'][si, -seq_mut_len:, :] = seq_1hot_mut.astype('bool')
 
         # initialize scores
         seq_scores = np.zeros((seq_mut_len, 4, num_targets), dtype='float32')
@@ -169,10 +180,12 @@ def cli(sequence_file, sequence_length, mutation_length, mutation_start, model_f
 
         # normalize
         seq_scores -= seq_scores.mean(axis=1, keepdims=True)
-
         # write to HDF5
         scores_h5['ref'][si] = preds_mut0.astype('float16')
-        scores_h5['ism'][si, -seq_mut_len:, :, :] = seq_scores.astype('float16')
+        if is_legnet_model:
+            scores_h5['ism'][si, -seq_mut_len:, :, :] = seq_scores[:,[0,2,1,3],:].astype('float16')
+        else:
+            scores_h5['ism'][si, -seq_mut_len:, :, :] = seq_scores.astype('float16')
 
         # increment sequence
         si += 1
