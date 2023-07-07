@@ -1,13 +1,30 @@
 ---
-# config file for github actions
 seed: 42
 wrapper_directory: /data/gpfs-1/users/schubacm_c/work/projects/snakemake_wrappers
 reference:
   genome: resources/example.fa.genome
   fasta: resources/example.fa
+regression: true
+adapters:
+  left: AGGACCGGATCAACT
+  right: CATTGCGTGAACCGA
+training:
+  model: standard
+  loss: MSE
+  augmentation: true
+  augment_on: [16, 215]
+prediction:
+  augmentation: true
+  augment_on: [16, 215]
+  output_names: [value1, value2, value3] # same header names as in inpu/labels, should have the size of output_size,
+  output_size: 3 # number of outputs for the model (>1 it is a multitask model)
 input:
-  length: 200
-  merge: 50
-  sliding: 50
-samples: config/samples.tsv
-tests: config/tests.tsv
+  fasta: oligos.fa
+  labels: labled_bins.tsv # BIN, ID (same as in fast), value1, value2, value3 (>1 value it is a multitask model)
+satmut:
+  sequence_length: 200
+  step_size: 150
+ism_regions:
+  LDLR: chr19:11089268-11089498
+  SORT1_1: chr1:109274785-109275015
+  SORT1_2: chr1:109274986-109275216
