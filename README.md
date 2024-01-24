@@ -1,4 +1,4 @@
-# Snakemake workflow: Sequence CNN Models
+# Snakemake workflow: Sequence CNN Models -
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.15.2-brightgreen.svg)](https://snakemake.bitbucket.io)
 ![Tests](https://github.com/visze/sequence_cnn_models/workflows/Tests/badge.svg)
