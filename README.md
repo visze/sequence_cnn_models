@@ -1,14 +1,20 @@
-# Snakemake workflow: Sequence CNN Models -
+# MPRAnn - A Snakemake workflow
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.15.2-brightgreen.svg)](https://snakemake.bitbucket.io)
 ![Tests](https://github.com/visze/sequence_cnn_models/workflows/Tests/badge.svg)
-
 [![Build Status](https://travis-ci.org/snakemake-workflows/sequence_cnn_models.svg?branch=master)](https://travis-ci.org/snakemake-workflows/sequence_cnn_models)
 
-Workflow to generate sequence based CNN models from regions (e.g. open chromatin).
+This is a workflow to generate DNA sequence-based CNN models from genomic DNA sequences predicting MPRA activity for e.g.,log(RNA/DNA) values.
 
-This is the template for a new Snakemake workflow. Replace this text with a comprehensive description covering the purpose and domain.
-Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs`. Define the entry point of the workflow in the `Snakefile` and the main configuration in the `config.yaml` file.
+The workflow includes respective folders as follows:
+```
+    sequence_cnn_models/
+        ├── config (contains workflow config files and sample files)
+        ├── docs (for documentation)
+        ├── resources (demo data, reference files, etc.)
+        └── workflow (snakemake workflow and scripts)
+```
+Codes are in respective folders, i.e. `scripts`, `rules`, and `envs`. The workflow in the `Snakefile` and the main configuration in the `config.yml` file. Please review the config.yaml file and adjust parameters accordingly.
 
 ## Authors
 
@@ -18,6 +24,12 @@ Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs
 
 If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository and, if available, its DOI (see above).
 
+## Dependencies
+
+Snakemake manages dependencies automatically via conda, please update `workflow\envs\` files accordingly.
+
+Please download a copy of [Snakemake Wrappers](https://github.com/snakemake/snakemake-wrappers) in the `resources\` directory or update the `config.yml` file accordingly.
+
 ### Step 1: Obtain a copy of this workflow
 
 1. Create a new github repository using this workflow [as a template](https://help.github.com/en/articles/creating-a-repository-from-a-template).
@@ -25,7 +37,7 @@ If you use this workflow in a paper, don't forget to give credits to the authors
 
 ### Step 2: Configure workflow
 
-Configure the workflow according to your needs via editing the files in the `config/` folder. Adjust `config.yaml` to configure the workflow execution, and `samples.tsv` to specify your sample setup.
+Configure the workflow according to your needs via editing the files in the `config/` folder. Adjust `config.yml` to configure the workflow execution, and `samples.tsv` to specify your sample setup.
 
 ### Step 3: Install Snakemake
 
@@ -105,4 +117,6 @@ In case you have also changed or added steps, please consider contributing them 
 ## Testing
 
 Test cases are in the subfolder `.test`. They are automatically executed via continuous integration with [Github Actions](https://github.com/features/actions).
+
+## Demo
 

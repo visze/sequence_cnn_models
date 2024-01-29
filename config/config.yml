@@ -1,6 +1,6 @@
 ---
 seed: 42
-wrapper_directory: /data/gpfs-1/users/schubacm_c/work/projects/snakemake_wrappers
+wrapper_directory: resources/snakemake_wrappers
 reference:
   genome: resources/example.fa.genome
   fasta: resources/example.fa
@@ -16,7 +16,7 @@ training:
 prediction:
   augmentation: true
   augment_on: [16, 215]
-  output_names: [value1, value2, value3]  # same header names as in inpu/labels, should have the size of output_size,
+  output_names: [value1, value2, value3]  # same header names as in input/labels, should have the size of output_size,
   output_size: 3  # number of outputs for the model (>1 it is a multitask model)
 input:
   fasta: oligos.fa
