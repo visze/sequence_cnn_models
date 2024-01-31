@@ -130,7 +130,9 @@ Let's try to run the workflow with the demo data provided in the `resources\` di
 ### Input files
 
 The input files are in the `resources\demo\` directory. The input files are as follows:
+    
     1. `resources\demo\example_sequences.fa` - contains the DNA sequences in fasta format
+    
     2. `resources\demo\example_labels.tsv` - contains 3 columns i.e., 'BIN', 'ID', and, 'MEAN' (value1*) in tsv format. 
 
 The 'BIN' column contains the bin number (1-10) and the 'ID' column contains the sequence ID. The 'ID' column should match the sequence ID in the fasta file. The 'MEAN' column contains the mean value of the log(RNA/DNA). Adding more columns is possible, as additional values which starts a multi-task learning.
@@ -166,7 +168,7 @@ input:
 
 Run as follows (if the device has GPU, snakemake will automatically detect it and run the workflow on GPU):
 ```bash
-    snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 4 --use-conda -p
+snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 4 --use-conda -p
 ```
 Typical runtime on a non-GPU device is ~ 1 hour and 30 minutes.
 
@@ -193,6 +195,8 @@ The output files are now in the `results\` directory.
 ```
 
 The file `results/predictions/finalConcat.labels.cleaned.tsv.gz` contains the predicted values for the input sequences. 
+
 The file `results/correlation/regression.MEAN.tsv.gz` contains the correlation between predicted and observed values.
+
 All models are saved in the `results/training/` directory as `.json` and `.h5` files.
 
