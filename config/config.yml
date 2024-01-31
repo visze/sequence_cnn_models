@@ -2,8 +2,8 @@
 seed: 42
 wrapper_directory: resources/snakemake_wrappers
 reference:
-  genome: resources/example.fa.genome
-  fasta: resources/example.fa
+  genome: resources/example.fa.genome # genome file .genome
+  fasta: resources/example.fa # genome file .fa
 regression: true
 adapters:
   left: AGGACCGGATCAACT
@@ -16,11 +16,11 @@ training:
 prediction:
   augmentation: true
   augment_on: [16, 215]
-  output_names: [value1, value2, value3]  # same header names as in input/labels, should have the size of output_size,
-  output_size: 3  # number of outputs for the model (>1 it is a multitask model)
+  output_names: [MEAN]  # same header names as in input/labels, should have the size of output_size,
+  output_size: 1  # number of outputs for the model (>1 it is a multitask model)
 input:
-  fasta: oligos.fa
-  labels: labled_bins.tsv  # BIN, ID (same as in fast), value1, value2, value3 (>1 value it is a multitask model)
+  fasta: resources/demo/example_sequences.fa
+  labels: resources/demo/example_labels.tsv  # BIN, ID (same as in fast), value1, value2, value3 (>1 value it is a multitask model)
 satmut:
   sequence_length: 200
   step_size: 150

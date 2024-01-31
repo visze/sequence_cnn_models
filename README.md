@@ -14,11 +14,12 @@ The workflow includes respective folders as follows:
         ├── resources (demo data, reference files, etc.)
         └── workflow (snakemake workflow and scripts)
 ```
-Codes are in respective folders, i.e. `scripts`, `rules`, and `envs`. The workflow in the `Snakefile` and the main configuration in the `config.yml` file. Please review the config.yaml file and adjust parameters accordingly.
+Codes are in respective folders, i.e. `scripts`, `rules`, and `envs` (in `workflow\`). The workflow is in the `workflow\Snakefile` and the main configuration is in the `config\config.yml` file. Please review this file and adjust parameters accordingly.
 
 ## Authors
 
 * Max Schubach (@visze), Berlin Institute of Health (BIH), [Computational Genome Biology](https://kircherlab.bihealth.org)
+* Pyaree Mohan Dash (@vpyareedash), Berlin Institute of Health (BIH), [Computational Genome Biology](https://kircherlab.bihealth.org)
 
 ## Usage
 
@@ -29,6 +30,9 @@ If you use this workflow in a paper, don't forget to give credits to the authors
 Snakemake manages dependencies automatically via conda, please update `workflow\envs\` files accordingly.
 
 Please download a copy of [Snakemake Wrappers](https://github.com/snakemake/snakemake-wrappers) in the `resources\` directory or update the `config.yml` file accordingly.
+
+The workflow also requires a reference genome in 1. .genome format, and 2. .fasta format. 
+Please download the reference genome in the `resources\` directory or update the `config.yml` file accordingly.
 
 ### Step 1: Obtain a copy of this workflow
 
@@ -46,6 +50,7 @@ Install Snakemake using [conda](https://conda.io/projects/conda/en/latest/user-g
     conda create -c bioconda -c conda-forge -n snakemake snakemake
 
 For installation details, see the [instructions in the Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+A typical installation takes ~ 5 minutes in a normal desktop computer.
 
 ### Step 4: Execute workflow
 
@@ -119,4 +124,75 @@ In case you have also changed or added steps, please consider contributing them 
 Test cases are in the subfolder `.test`. They are automatically executed via continuous integration with [Github Actions](https://github.com/features/actions).
 
 ## Demo
+
+Let's try to run the workflow with the demo data provided in the `resources\` directory. (i.e., `resources\demo\`)
+
+### Input files
+
+The input files are in the `resources\demo\` directory. The input files are as follows:
+    1. `resources\demo\example_sequences.fa` - contains the DNA sequences in fasta format
+    2. `resources\demo\example_labels.tsv` - contains 3 columns i.e., 'BIN', 'ID', and, 'MEAN' (value1*) in tsv format. 
+
+The 'BIN' column contains the bin number (1-10) and the 'ID' column contains the sequence ID. The 'ID' column should match the sequence ID in the fasta file. The 'MEAN' column contains the mean value of the log(RNA/DNA). Adding more columns is possible, as additional values which starts a multi-task learning.
+
+### Configure config.yml
+
+1. Add the path of snakemake wrapper directory as follows:
+```
+...
+wrapper_directory: resources/snakemake_wrappers
+...
+```
+
+2. Please add the path of the reference genome files as follows:
+```
+...
+reference:
+  genome: resources/example.fa.genome # genome file .genome
+  fasta: resources/example.fa # genome file .fa
+...  
+```
+
+3. Add the path of the input files as follows:
+```
+...
+input:
+  fasta: resources/demo/example_sequences.fa
+  labels: resources/demo/example_labels.tsv
+...
+```  
+
+### Run the workflow 
+
+Run as follows (if the device has GPU, snakemake will automatically detect it and run the workflow on GPU):
+```bash
+    snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 4 --use-conda -p
+```
+Typical runtime on a non-GPU device is ~ 1 hour and 30 minutes.
+
+A successful run ends up with the following output:
+```
+...
+Finished job 0.
+n of n steps (100%) done
+Complete log: .snakemake/log/20XX-XX-27T155007.853000.snakemake.log
+```
+
+### Expected Output
+
+The output files are now in the `results\` directory. 
+```
+    sequence_cnn_models/results/
+        ├── correlation
+            ├── regression.MEAN.tsv.gz (correlation between predicted and observed values)
+        ├── predictions
+            ├── finalConcat.labels.cleaned.tsv.gz
+            ...
+        ├── regression_input (Train, test and validation input files used for training)
+        └── training (Performance of fitted models, log.tsv files, model.json, model.h5, etc.) 
+```
+
+The file `results/predictions/finalConcat.labels.cleaned.tsv.gz` contains the predicted values for the input sequences. 
+The file `results/correlation/regression.MEAN.tsv.gz` contains the correlation between predicted and observed values.
+All models are saved in the `results/training/` directory as `.json` and `.h5` files.
 
