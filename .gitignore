@@ -7,7 +7,7 @@ analysis/*
 !docs
 !docs/*
 !resources
-!resources/*
+resources/*
 !resources/satmut_examples/*
 !.github
 !.github/**
