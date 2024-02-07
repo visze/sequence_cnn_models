@@ -168,9 +168,9 @@ input:
 
 Run as follows (if the device has GPU, snakemake will automatically detect it and run the workflow on GPU):
 ```bash
-snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 4 --use-conda -p
+snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 1 --use-conda -p
 ```
-Typical runtime on a non-GPU device is ~ 1 hour and 30 minutes.
+Typical runtime on a non-GPU device is ~ 1 hour and 30 minutes. (1 hour 15 minutes in a GPU enabled device)
 
 A successful run ends up with the following output:
 ```
@@ -191,7 +191,7 @@ The output files are now in the `results\` directory.
             ├── finalConcat.labels.cleaned.tsv.gz
             ...
         ├── regression_input (Train, test and validation input files used for training)
-        └── training (Performance of fitted models, log.tsv files, model.json, model.h5, etc.) 
+        └── training (Performance of fitted models, log.tsv files, *model.json*, *model.h5*, etc.) 
 ```
 
 The file `results/predictions/finalConcat.labels.cleaned.tsv.gz` contains the predicted values for the input sequences. 
