@@ -173,7 +173,7 @@ snakemake --snakefile workflow/Snakefile --configfile config/config.yml -c 1 --u
 Typical runtime on a non-GPU device is ~ 1 hour and 30 minutes. (1 hour 15 minutes in a GPU enabled device)
 
 A successful run ends up with the following output:
-```json
+```html
 ...
 Finished job 0.
 n of n steps (100%) done
@@ -183,7 +183,7 @@ Complete log: .snakemake/log/20XX-XX-27T155007.853000.snakemake.log
 ### Expected Output
 
 The output files are now in the `results\` directory. 
-```json
+```html
     sequence_cnn_models/results/
         ├── correlation
             ├── regression.MEAN.tsv.gz (correlation between predicted and observed values)
