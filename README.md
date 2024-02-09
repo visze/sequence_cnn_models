@@ -200,3 +200,11 @@ The file `results/correlation/regression.MEAN.tsv.gz` contains the correlation b
 
 All models are saved in the `results/training/` directory as `.json` and `.h5` files.
 
+### Run the workflow with MPRAnn best model
+
+To run the workflow with the best model of MPRAnn (introduced in [Agarwal et al., 2023](https://pubmed.ncbi.nlm.nih.gov/36945371/)), please download the model files from [Zenodo](https://zenodo.org/records/8219231) and update the `config.yml` file accordingly or use `config/config_mprann.yml` file.
+
+Note: Please modify cell type names depending on the model or model files used.
+
+
+

@@ -1,0 +1,223 @@
+seed: 42
+wrapper_directory: resources/snakemake_wrappers
+reference:
+  genome: resources/reference/GRCh38/hs38/hs38.fa.genome # Reference genome file (.genome)
+  fasta: resources/reference/GRCh38/hs38/hs38.fa # reference genome file (.fasta)
+# adapters:
+#   left: AGGACCGGATCAACT
+#   right: CATTGCGTGAACCGA
+training:
+  model: standard
+  model_files: # please modify respective model files accordingly.
+    model:
+      1:
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      2:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      3:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      4:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      5:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      6:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      7:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      8:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      9:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+      10:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/config.json
+    weights:
+      1:
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test1_val10.ckpt
+      2:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val1.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test2_val10.ckpt
+      3:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val2.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test3_val10.ckpt
+      4:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val3.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test4_val10.ckpt
+      5:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val4.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test5_val10.ckpt
+      6:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val5.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test6_val10.ckpt
+      7:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val6.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test7_val10.ckpt
+      8:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val7.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val9.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test8_val10.ckpt
+      9:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val8.ckpt
+        10: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test9_val10.ckpt
+      10:
+        1: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val1.ckpt
+        2: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val2.ckpt
+        3: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val3.ckpt
+        4: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val4.ckpt
+        5: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val5.ckpt
+        6: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val6.ckpt
+        7: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val7.ckpt
+        8: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val8.ckpt
+        9: best_model/models/HepG2/md_shift_reverse_noavg_noch/best_model_test10_val9.ckpt
+  augmentation: true
+  augment_on: [16, 215]
+prediction:
+  augmentation: true
+  augment_on: [16, 215]
+  output_names: [MEAN]
+  output_size: 1
+input:
+  fasta: input_sequences.fasta # Input file to test
+
