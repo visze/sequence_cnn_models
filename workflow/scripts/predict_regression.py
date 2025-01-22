@@ -1,15 +1,20 @@
 import click
 import pandas as pd
 
-from lib.sequence import SeqRegressionDataLoader1D
+from lib.sequence import SeqRegressionDataLoader1D, SeqFastaLoader1D
 
 # options
 
 
 @click.command()
+@click.option('--test-fasta-file',
+              'test_fasta_file',
+              required=False,
+              type=click.Path(exists=True, readable=True),
+              help='Test Fasta sequences')
 @click.option('--test',
               'test_file',
-              required=True,
+              required=False,
               type=click.Path(exists=True, readable=True),
               help='Test sequences')
 @click.option('--model',
@@ -43,6 +48,12 @@ from lib.sequence import SeqRegressionDataLoader1D
     type=(int, int),
     help="Augment data using reverse complement from given start to stop.",
 )
+@click.option("--sequence-length",
+              "sequence_length",
+              required=True,
+              type=int,
+              help="Length of the sequence"
+              )
 @click.option('--prediction-name',
                 'prediction_name',
                 required=False,
@@ -53,18 +64,17 @@ from lib.sequence import SeqRegressionDataLoader1D
               required=True,
               type=click.Path(writable=True),
               help='Prediction output file')
-def cli(test_file, model_file, weights_file, augment_on, use_augmentation, is_legnet_model, output_file, prediction_name):
-
-    
+def cli(test_fasta_file, test_file, model_file, weights_file, augment_on, use_augmentation, sequence_length, is_legnet_model, output_file, prediction_name):
 
     if is_legnet_model:
         alphabet = "AGCT"
     else:
         alphabet = "ACGT"
-    dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=use_augmentation, 
-                                        augment_on=augment_on, ignore_targets=True, alphabet=alphabet)
 
-
+    if (test_fasta_file):
+        dl_test = SeqFastaLoader1D(test_fasta_file, length=sequence_length, augment=use_augmentation, augment_on=augment_on, alphabet=alphabet)
+    else:
+        dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=use_augmentation, augment_on=augment_on, ignore_targets=True, alphabet=alphabet)
 
     test_data = dl_test.load_all()
 
@@ -78,7 +88,7 @@ def cli(test_file, model_file, weights_file, augment_on, use_augmentation, is_le
     preds = pd.DataFrame(preds, test_data["metadata"]["id"])
     preds.index.name = "ID"
     for col in preds.columns:
-        preds = preds.rename(columns={col: "%s.%d" % (prediction_name,col) })
+        preds = preds.rename(columns={col: "%s.%d" % (prediction_name, col) })
     print(preds.head())
     agg = {}
     for col in preds.columns:
@@ -88,6 +98,7 @@ def cli(test_file, model_file, weights_file, augment_on, use_augmentation, is_le
     preds = preds.agg(agg)
     print(preds.head())
     preds.to_csv(output_file, sep='\t', header=True, index=True)
+
 
 if __name__ == '__main__':
     cli()

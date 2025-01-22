@@ -1,14 +1,17 @@
 ################################
 #### Global functions       ####
 ################################
-from snakemake.workflow import srcdir
+import os
 
-SCRIPTS_DIR = srcdir("../scripts")
-RESOURCES_DIR = srcdir("../../resources")
+
+SCRIPTS_DIR = "../scripts"
 
 
 def getScript(name):
-    return "%s/%s" % (SCRIPTS_DIR, name)
+    return workflow.source_path("%s/%s" % (SCRIPTS_DIR, name))
+
+
+RESOURCES_DIR = os.path.dirname(workflow.source_path("../../resources/example.fa"))
 
 
 from snakemake.utils import validate
@@ -166,6 +169,7 @@ def getlabelsForRename():
         out["%d.MEAN_prediction" % i] = "%s_MPRAnn" % name
         out["%d.STD_prediction" % i] = "%s_STD_MPRAnn" % name
     return out
+
 
 def getColumnsForMean(test_fold):
     validation_folds = getValidationFoldsForTest(test_fold, config["training"]["folds"])

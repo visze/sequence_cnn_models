@@ -63,16 +63,21 @@ else:
             model=config["training"]["model"],
             lrSheduler="--no-learning-rate-sheduler",
             earlyStopping="--use-early-stopping",
-            augmentation="--use-augmentation"
-            if config["training"]["augmentation"] or "augment_on" in config["training"]
-            else "--no-augmentation",
-            augment_on="--augment-on %d %d"
-            % (
-                config["training"]["augment_on"][0],
-                config["training"]["augment_on"][1],
-            )
-            if "augment_on" in config["training"]
-            else "",
+            augmentation=(
+                "--use-augmentation"
+                if config["training"]["augmentation"]
+                or "augment_on" in config["training"]
+                else "--no-augmentation"
+            ),
+            augment_on=(
+                "--augment-on %d %d"
+                % (
+                    config["training"]["augment_on"][0],
+                    config["training"]["augment_on"][1],
+                )
+                if "augment_on" in config["training"]
+                else ""
+            ),
         conda:
             "../envs/tensorflow.yml"
         threads: 25

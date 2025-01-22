@@ -1,7 +1,7 @@
 wildcard_constraints:
-    region="[^/.]+",
-    sequence_length="\d+",
-    target="\d+",
+    region=r"[^/.]+",
+    sequence_length=r"\d+",
+    target=r"\d+",
 
 
 rule plot_ism_get_region:

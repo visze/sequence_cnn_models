@@ -115,15 +115,19 @@ rule plot_satmut_predict_region:
         mask=" ".join(
             ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
         ),
-        legnet="--legnet-model"
-        if config["training"]["model"] == "legnet"
-        else "--no-legnet-model",
+        legnet=(
+            "--legnet-model"
+            if config["training"]["model"] == "legnet"
+            else "--no-legnet-model"
+        ),
     log:
         "logs/plot/satmut/predict_region.{region}.{test_fold}.{validation_fold}.log",
     conda:
-        "legnet" if config["training"][
-        "model"
-        ] == "legnet" else "../../envs/tensorflow.yml"
+        (
+            "legnet"
+            if config["training"]["model"] == "legnet"
+            else "../../envs/tensorflow.yml"
+        )
     shell:
         """
         python {input.script} \

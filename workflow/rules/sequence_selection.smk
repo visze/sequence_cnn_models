@@ -47,8 +47,7 @@ if not isRegression():
             sort -k1,1 -k2,2n | uniq | bgzip -c > {output.region} 2> {log}
             """
 
-
-# negative background data
+    # negative background data
 
     rule sequence_selection_negative_background_widnows:
         input:
@@ -77,7 +76,6 @@ if not isRegression():
             "logs/sequence_selection/negative_background_input.log",
         wrapper:
             getWrapper("negative_training_sampler/create_input")
-
 
     import random
 
@@ -113,8 +111,7 @@ if not isRegression():
             bgzip -c > {output} 2> {log}
             """
 
-
-# create regions file
+    # create regions file
 
     rule sequence_selection_create_regions_file:
         conda:
@@ -154,8 +151,7 @@ if not isRegression():
             sort -k1,1 -k2,2n | uniq | bgzip -c > {output.regions} 2> {log}
             """
 
-
-# train test validate regions
+    # train test validate regions
 
     rule sequence_selection_training_regions:
         conda:
@@ -211,8 +207,7 @@ if not isRegression():
             bgzip -c > {output} 2>{log}
             """
 
-
-# bidirectional
+    # bidirectional
 
     rule sequence_selection_bidirectional:
         conda:
@@ -231,8 +226,7 @@ if not isRegression():
             ) | sort -k1,1 -k2,2n | bgzip -c > {output} 2>{log}
             """
 
-
-# extract fasta
+    # extract fasta
 
     rule sequence_selection_extract_fasta:
         conda:

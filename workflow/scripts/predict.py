@@ -16,7 +16,7 @@ import tensorflow as tf
               help='Test Fasta sequences')
 @click.option('--test-file',
               'test_file',
-              required=True,
+              required=False,
               type=click.Path(exists=True, readable=True),
               help='Test sequences')
 @click.option('--model',
@@ -64,7 +64,7 @@ def cli(test_fasta_file, test_file, model_file, weights_file, augment_on, use_au
     strategy = tf.distribute.MirroredStrategy(devices=None)
 
     if (test_fasta_file):
-        dl_test = SeqFastaLoader1D(test_fasta_file, length=sequence_length, augment=use_augmentation, augment_on=augment_on,)
+        dl_test = SeqFastaLoader1D(test_fasta_file, length=sequence_length, augment=use_augmentation, augment_on=augment_on)
     else:
         dl_test = SeqRegressionDataLoader1D(tsv_file=test_file, label_dtype=float, augment=use_augmentation, augment_on=augment_on, ignore_targets=True)
 

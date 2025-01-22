@@ -193,15 +193,19 @@ rule model_interpretation_ism:
         mask=" ".join(
             ["--mask %d %d " % (i[0], i[1]) for i in config["prediction"]["mask"]]
         ),
-        legnet="--legnet-model"
-        if config["training"]["model"] == "legnet"
-        else "--no-legnet-model",
+        legnet=(
+            "--legnet-model"
+            if config["training"]["model"] == "legnet"
+            else "--no-legnet-model"
+        ),
     log:
         "logs/model_interpretation/ism.{test_fold}.{validation_fold}.log",
     conda:
-        "legnet" if config["training"][
-        "model"
-        ] == "legnet" else "../envs/tensorflow.yml"
+        (
+            "legnet"
+            if config["training"]["model"] == "legnet"
+            else "../envs/tensorflow.yml"
+        )
     shell:
         """
         python {input.script} \

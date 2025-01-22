@@ -3,7 +3,9 @@ name: legnet
 channels:
   - conda-forge
   - bioconda
-  - defaults
+  - nodefaults
+  - pytorch
+  - pypi
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=2_kmp_llvm
@@ -168,7 +170,7 @@ dependencies:
   - python-slugify=8.0.1=pyhd8ed1ab_1
   - python-tzdata=2023.3=pyhd8ed1ab_0
   - python_abi=3.11=3_cp311
-  - pytorch=2.0.0=cuda112py311h13fee9e_200
+  - pytorch=2.0.0
   - pytorch-lightning=2.0.3=pyhd8ed1ab_0
   - pytz=2023.3=pyhd8ed1ab_0
   - pyvcf3=1.0.3=pyhdfd78af_0
@@ -219,4 +221,5 @@ dependencies:
   - yaml=0.2.5=h7f98852_2
   - zipp=3.15.0=pyhd8ed1ab_0
   - zstd=1.5.2=h3eb15da_6
-prefix: /data/gpfs-1/users/schubacm_c/work/miniconda3/envs/legnet
+  - pyfaidx
+  - pip

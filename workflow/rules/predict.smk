@@ -39,21 +39,25 @@ if not isRegression():
         log:
             "logs/predict/prediction.{test_name}.log",
         params:
-            input_file=lambda wc: "--test-fasta-file"
-            if isFastaFile(wc.test_name)
-            else "--test-file",
+            input_file=lambda wc: (
+                "--test-fasta-file" if isFastaFile(wc.test_name) else "--test-file"
+            ),
             length=config["input"]["length"],
-            augmentation=lambda wc: "--use-augmentation"
-            if config["prediction"]["samples"][wc.test_name]["augmentation"]
-            or "augment_on" in config["prediction"]["samples"][wc.test_name]
-            else "--no-augmentation",
-            augment_on=lambda wc: "--augment-on %d %d"
-            % (
-                config["prediction"]["samples"][wc.test_name]["augment_on"][0],
-                config["prediction"]["samples"][wc.test_name]["augment_on"][1],
-            )
-            if "augment_on" in config["prediction"]["samples"][wc.test_name]
-            else "",
+            augmentation=lambda wc: (
+                "--use-augmentation"
+                if config["prediction"]["samples"][wc.test_name]["augmentation"]
+                or "augment_on" in config["prediction"]["samples"][wc.test_name]
+                else "--no-augmentation"
+            ),
+            augment_on=lambda wc: (
+                "--augment-on %d %d"
+                % (
+                    config["prediction"]["samples"][wc.test_name]["augment_on"][0],
+                    config["prediction"]["samples"][wc.test_name]["augment_on"][1],
+                )
+                if "augment_on" in config["prediction"]["samples"][wc.test_name]
+                else ""
+            ),
             output_names=" ".join(
                 [
                     "--prediction-name %s" % i
@@ -110,32 +114,60 @@ if isRegression():
     rule predict_prediction:
         input:
             test_file=lambda wc: getPredictionTestFile(wc.test_name),
-            model=lambda wc: getModelPath()["model"],
-            weights=lambda wc: getModelPath()["weights"],
-            script=getScript("predict.py"),
+            model=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["model"],
+            weights=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["weights"],
+            script=getScript("predict_regression.py"),
+            lib=[getScript("lib/sequence.py"),
+            getScript("lib/__init__.py"),
+            getScript("lib/prediction_tf.py"),
+            getScript("lib/prediction_legnet.py"),
+            getScript("lib/human_legnet/__init__.py"),
+            getScript("lib/human_legnet/trainer.py"),
+            getScript("lib/human_legnet/asb.py"),
+            getScript("lib/human_legnet/asb_predict.py"),
+            getScript("lib/human_legnet/core.py"),
+            getScript("lib/human_legnet/coverage.py"),
+            getScript("lib/human_legnet/coverage_predict.py"),
+            getScript("lib/human_legnet/utils.py"),
+            getScript("lib/human_legnet/datamodule.py"),
+            getScript("lib/human_legnet/training_config.py"),
+            getScript("lib/human_legnet/model.py")],
         output:
             "results/test_predictions/predictions/perModel/{test_name}.{test_fold}.{validation_fold}.tsv.gz",
         log:
             "logs/predict/prediction.{test_name}.{test_fold}.{validation_fold}.log",
         params:
-            input_file=lambda wc: "--test-fasta-file"
-            if isFastaFile(wc.test_name)
-            else "--test-file",
+            input_file=lambda wc: (
+                "--test-fasta-file" if isFastaFile(wc.test_name) else "--test-file"
+            ),
             length=config["input"]["length"],
-            augmentation=lambda wc: "--use-augmentation"
-            if config["prediction"]["samples"][wc.test_name]["augmentation"]
-            or "augment_on" in config["prediction"]["samples"][wc.test_name]
-            else "--no-augmentation",
-            augment_on=lambda wc: "--augment-on %d %d"
-            % (
-                config["prediction"]["samples"][wc.test_name]["augment_on"][0],
-                config["prediction"]["samples"][wc.test_name]["augment_on"][1],
-            )
-            if "augment_on" in config["prediction"]["samples"][wc.test_name]
-            else "",
+            augmentation=lambda wc: (
+                "--use-augmentation"
+                if config["prediction"]["samples"][wc.test_name]["augmentation"]
+                or "augment_on" in config["prediction"]["samples"][wc.test_name]
+                else "--no-augmentation"
+            ),
+            augment_on=lambda wc: (
+                "--augment-on %d %d"
+                % (
+                    config["prediction"]["samples"][wc.test_name]["augment_on"][0],
+                    config["prediction"]["samples"][wc.test_name]["augment_on"][1],
+                )
+                if "augment_on" in config["prediction"]["samples"][wc.test_name]
+                else ""
+            ),
             prediction_name=lambda wc: wc.validation_fold,
+            legnet=(
+                "--legnet-model"
+                if config["training"]["model"] == "legnet"
+                else "--no-legnet-model"
+            ),
         conda:
-            "../envs/tensorflow.yml"
+            (
+                "../envs/legnet.yml"
+                if config["training"]["model"] == "legnet"
+                else "../envs/tensorflow.yml"
+            )
         threads: 1
         shell:
             """
@@ -144,6 +176,7 @@ if isRegression():
             --model {input.model} --weights {input.weights} \
             --sequence-length {params.length} \
             {params.augmentation} {params.augment_on} \
+            {params.legnet} \
             --prediction-name {params.prediction_name} \
             --output {output} &> {log}
             """
@@ -251,36 +284,61 @@ if isRegression():
             model=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["model"],
             weights=lambda wc: getModelPath(wc.test_fold, wc.validation_fold)["weights"],
             script=getScript("predict_regression.py"),
+            lib=[getScript("lib/sequence.py"),
+            getScript("lib/__init__.py"),
+            getScript("lib/prediction_tf.py"),
+            getScript("lib/prediction_legnet.py"),
+            getScript("lib/human_legnet/__init__.py"),
+            getScript("lib/human_legnet/trainer.py"),
+            getScript("lib/human_legnet/asb.py"),
+            getScript("lib/human_legnet/asb_predict.py"),
+            getScript("lib/human_legnet/core.py"),
+            getScript("lib/human_legnet/coverage.py"),
+            getScript("lib/human_legnet/coverage_predict.py"),
+            getScript("lib/human_legnet/utils.py"),
+            getScript("lib/human_legnet/datamodule.py"),
+            getScript("lib/human_legnet/training_config.py"),
+            getScript("lib/human_legnet/model.py")],
         output:
             temp("results/predictions/prediction.{test_fold}.{validation_fold}.tsv.gz"),
         params:
             prediction_name=lambda wc: wc.validation_fold,
-            augmentation="--use-augmentation"
-            if config["prediction"]["augmentation"]
-            or "augment_on" in config["prediction"]
-            else "--no-augmentation",
-            augment_on="--augment-on %d %d"
-            % (
-                config["prediction"]["augment_on"][0],
-                config["prediction"]["augment_on"][1],
-            )
-            if "augment_on" in config["prediction"]
-            else "",
-            legnet="--legnet-model"
-            if config["training"]["model"] == "legnet"
-            else "--no-legnet-model",
+            augmentation=(
+                "--use-augmentation"
+                if config["prediction"]["augmentation"]
+                or "augment_on" in config["prediction"]
+                else "--no-augmentation"
+            ),
+            augment_on=(
+                "--augment-on %d %d"
+                % (
+                    config["prediction"]["augment_on"][0],
+                    config["prediction"]["augment_on"][1],
+                )
+                if "augment_on" in config["prediction"]
+                else ""
+            ),
+            legnet=(
+                "--legnet-model"
+                if config["training"]["model"] == "legnet"
+                else "--no-legnet-model"
+            ),
+            length=config["input"]["length"],
         log:
             "logs/predict/regression.{test_fold}.{validation_fold}.log",
         conda:
-            "legnet" if config["training"][
-            "model"
-            ] == "legnet" else "../envs/tensorflow.yml"
+            (
+                "legnet"
+                if config["training"]["model"] == "legnet"
+                else "../envs/tensorflow.yml"
+            )
         threads: 1
         shell:
             """
             python {input.script} \
             --test {input.test_file} \
             --model {input.model} --weights {input.weights} \
+            --sequence-length {params.length} \
             {params.augmentation} {params.augment_on} \
             {params.legnet} \
             --prediction-name {params.prediction_name} \

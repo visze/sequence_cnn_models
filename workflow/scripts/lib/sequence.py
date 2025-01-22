@@ -250,6 +250,10 @@ class StringFastaLoader1D(Dataset):
               md5: TODO
         force_upper:
             doc: Force uppercase output of sequences
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         length:
             doc: Adding Ns at the beginning/end of the sequence to fit the length.
         mask:
@@ -266,22 +270,44 @@ class StringFastaLoader1D(Dataset):
                  fasta_file,
                  force_upper=True,
                  length=300,
+                 augment=False,
+                 augment_on=None,
                  mask=None):
 
         self.fasta_file = fasta_file
         self.length = length
+        self.augment = augment
+        self.augment_on = augment_on
+        if self.augment_on:
+            self.augment = True
         self.force_upper = force_upper
         self.mask = mask
 
         self.fasta = Fasta(self.fasta_file)
 
     def __len__(self):
+        if self.augment:
+            return 2 * len(self.fasta.keys())
         return len(self.fasta.keys())
 
     def __getitem__(self, idx):
 
+        reverseComplement = False
+
+        if self.augment:
+            if (idx % 2 == 1):
+                reverseComplement = True
+            idx = int(idx / 2)
+
         # Run the fasta extractor and transform if necessary
         seq = self.fasta[idx][0:self.length].seq
+        if reverseComplement:
+            if self.augment_on:
+                seq = seq[:self.augment_on[0]-1] + \
+                    F.rc_dna(seq[(self.augment_on[0]-1):self.augment_on[1]]) + seq[self.augment_on[1]:]
+            else:
+                seq = F.rc_dna(seq)
+
         name = self.fasta[idx][0:self.length].name
         if len(seq) <= self.length:
             seq = seq + 'N' * (self.length - len(seq))
@@ -430,10 +456,14 @@ class SeqFastaLoader1D(Dataset):
             doc: >
                 alphabet to use for the one-hot encoding. This defines the order of the one-hot encoding.
                 Can either be a list or a string: 'ACGT' or ['A, 'C', 'G', 'T']. Default: 'ACGT'
-        dtype:
-            doc: 'defines the numpy dtype of the returned array. Example: int, np.int32, np.float32, float'
+        augment:
+            doc: 'Use reverse complement of the input sequence in addition'
+        augment_on:
+            doc: 'Only augment this fraction of the sequences'
         mask:
             doc: 'defines sequences that should be masked using a 2d numpy array of indices'
+        dtype:
+            doc: 'defines the numpy dtype of the returned array. Example: int, np.int32, np.float32, float'
     output_schema:
         inputs:
             name: seq
@@ -448,11 +478,13 @@ class SeqFastaLoader1D(Dataset):
                  alphabet_axis=1,
                  dummy_axis=None,
                  alphabet="ACGT",
+                 augment=False,
+                 augment_on=None,
                  mask=None,
                  dtype=None):
 
         # core dataset, not using the one-hot encoding params
-        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length, mask=mask)
+        self.seq_dl = StringFastaLoader1D(fasta_file, fasta_file, length=length, augment=augment, augment_on=augment_on, mask=mask)
 
         self.input_transform = ReorderedOneHot(alphabet=alphabet,
                                                dtype=dtype,

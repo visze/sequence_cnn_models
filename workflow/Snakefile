@@ -15,7 +15,7 @@ container: "docker://continuumio/miniconda3"
 
 from snakemake.utils import min_version
 
-min_version("7.15.2")
+min_version("8.24.1")
 
 
 module wrappers:
@@ -105,22 +105,23 @@ if isRegression():
                 target_name=config["prediction"]["output_names"],
             ),
 
-    # rule all_satmut:
-    #     input:
-    #         expand(
-    #             "results/plot/satmut/{region}.{target}/{plot}.pdf",
-    #             plot=[
-    #                 "heatmap.all",
-    #                 "heatmap.sign",
-    #                 "scatter.all",
-    #                 "scatter.sign",
-    #                 "satmut",
-    #             ],
-    #             region=satmut.keys(),
-    #             target=range(0, config["prediction"]["output_size"]),
-    #         ),
-    #         expand(
-    #             "results/plot/satmut/correlation/{region}.{target}.tsv.gz",
-    #             region=satmut.keys(),
-    #             target=range(0, config["prediction"]["output_size"]),
-    #         ),
+
+# rule all_satmut:
+#     input:
+#         expand(
+#             "results/plot/satmut/{region}.{target}/{plot}.pdf",
+#             plot=[
+#                 "heatmap.all",
+#                 "heatmap.sign",
+#                 "scatter.all",
+#                 "scatter.sign",
+#                 "satmut",
+#             ],
+#             region=satmut.keys(),
+#             target=range(0, config["prediction"]["output_size"]),
+#         ),
+#         expand(
+#             "results/plot/satmut/correlation/{region}.{target}.tsv.gz",
+#             region=satmut.keys(),
+#             target=range(0, config["prediction"]["output_size"]),
+#         ),
