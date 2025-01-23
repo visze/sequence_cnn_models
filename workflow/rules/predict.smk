@@ -212,10 +212,10 @@ if isRegression():
             new_columns=lambda wc: np.array(
                 expand(
                     "{output}.{method}",
-                    method=["MEAN_prediction"],
+                    method=["MEAN_prediction", "STD_prediction"],
                     output=range(0, config["prediction"]["output_size"]),
                 )
-            ).reshape(1, config["prediction"]["output_size"]),
+            ).reshape(2, config["prediction"]["output_size"]),
             operations=["mean", "std"],
         log:
             "logs/predict/prediction_mean.{test_name}.{test_fold}.log",
@@ -245,7 +245,7 @@ if isRegression():
         params:
             columns=lambda wc: expand(
                 "{output}.{method}",
-                method=["MEAN_prediction", "STD_prediction"],
+                method=["MEAN_prediction"],
                 output=range(0, config["prediction"]["output_size"]),
             ),
             new_columns=lambda wc: np.array(
