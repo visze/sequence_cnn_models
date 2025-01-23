@@ -215,7 +215,7 @@ if isRegression():
                     method=["MEAN_prediction"],
                     output=range(0, config["prediction"]["output_size"]),
                 )
-            ).reshape(2, config["prediction"]["output_size"]),
+            ).reshape(1, config["prediction"]["output_size"]),
             operations=["mean", "std"],
         log:
             "logs/predict/prediction_mean.{test_name}.{test_fold}.log",
