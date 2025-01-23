@@ -212,7 +212,7 @@ if isRegression():
             new_columns=lambda wc: np.array(
                 expand(
                     "{output}.{method}",
-                    method=["MEAN_prediction", "STD_prediction"],
+                    method=["MEAN_prediction"],
                     output=range(0, config["prediction"]["output_size"]),
                 )
             ).reshape(2, config["prediction"]["output_size"]),
