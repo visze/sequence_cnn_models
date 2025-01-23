@@ -243,11 +243,13 @@ if isRegression():
         output:
             "results/test_predictions/predictions/finalMean.{test_name}.tsv.gz",
         params:
-            columns=lambda wc: expand(
-                "{output}.{method}",
-                method=["MEAN_prediction"],
-                output=range(0, config["prediction"]["output_size"]),
-            ),
+            columns=lambda wc: np.array(
+                expand(
+                    "{output}.{method}",
+                    method=["MEAN_prediction", "STD_prediction"],
+                    output=range(0, config["prediction"]["output_size"]),
+                )
+            ).reshape(2, config["prediction"]["output_size"]),
             new_columns=lambda wc: np.array(
                 expand(
                     "{output}.{method}",
