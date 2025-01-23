@@ -1,0 +1,89 @@
+---
+configfile: config/example_config.yaml
+software-deployment-method: conda
+default-resources:
+  slurm_partition: debug
+  mem: 2G
+  runtime: 60
+set-threads:
+  training_regression: 25
+  model_interpretation_deeplift: 25
+  model_interpretation_tfmodisco_ism: 16
+set-resources:
+  sequence_selection_negative_background_widnows:
+    time: 60
+    mem: 10G
+  sequence_selection_negative_background_input:
+    time: 60
+    mem: 10G
+  sequence_selection_negative_background_sampler:
+    time: 60
+    mem: 20G
+  training_multitask:
+    time: 7200
+    mem: 30G
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:4'"
+  predict_fromFasta:
+    time: 120
+    mem: 30G
+    cpus_per_task: 1
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  training_regression:
+    time: 480
+    mem: 30G
+    cpus_per_task: 25
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:4'"
+  predict_prediction:
+    time: 500
+    mem: 30G
+    cpus_per_task: 1
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  predict_regression:
+    time: 120
+    mem: 30G
+    cpus_per_task: 1
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  model_interpretation_runBackgroundSampler:
+    time: 600
+    cpus_per_task: 4
+    mem: 80G
+    slurm_partition: medium
+  model_interpretation_deepexplain:
+    time: 1440
+    mem: 30G
+    cpus_per_task: 25
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  model_interpretation_deeplift:
+    time: 1440
+    mem: 30G
+    cpus_per_task: 25
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  model_interpretation_ism:
+    time: 1440
+    mem: 80G
+    cpus_per_task: 25
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"
+  model_interpretation_tfmodisco_ism:
+    time: 600
+    mem: 30G
+    cpus_per_task: 16
+    slurm_partition: medium
+  model_interpretation_tfmodisco_lite_ism:
+    time: 600
+    mem: 30G
+    cpus_per_task: 30
+    slurm_partition: medium
+  plot_satmut_predict_region:
+    time: 10
+    mem: 10G
+    cpus_per_task: 1
+    slurm_partition: gpu
+    slurm_extra: "'--gres=gpu:tesla:1'"

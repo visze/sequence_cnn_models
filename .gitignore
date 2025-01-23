@@ -22,6 +22,8 @@ analysis/*
 !.flake8
 !LICENSE
 !README.md
+!profiles
+!profiles/**
 
 # python
 *.pyc
