@@ -243,7 +243,6 @@ if isRegression():
         output:
             "results/test_predictions/predictions/finalMean.{test_name}.tsv.gz",
         params:
-,
             columns=lambda wc: np.array(
                 expand(
                     "{output}.MEAN_prediction{file}",
