@@ -246,7 +246,7 @@ if isRegression():
             columns=lambda wc: expand(
                 "{output}.{method}",
                 method=["MEAN_prediction", "STD_prediction"],
-                output=range(1, config["training"]["folds"] + 1),
+                output=range(0, config["prediction"]["output_size"]),
             ),
             new_columns=lambda wc: np.array(
                 expand(
